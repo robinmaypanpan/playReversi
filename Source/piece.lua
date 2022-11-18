@@ -5,10 +5,10 @@ local gfx = playdate.graphics
 
 class('Piece').extends(gfx.sprite)
 
-function Piece:init(diameter, initialColor)
+function Piece:init(spaceSize, initialColor)
 	Piece.super.init(self)
 	self.pieceColor = initialColor
-	self.diameter = diameter
+	self.diameter = spaceSize - 5
 	
 	local pieceImage = self:drawPiece()
 	self:setImage(pieceImage)

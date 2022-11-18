@@ -4,6 +4,7 @@ import 'CoreLibs/sprites'
 local gfx = playdate.graphics
 
 import 'piece'
+import 'cursor'
 
 class('Board').extends(gfx.sprite)
 
@@ -58,11 +59,22 @@ function Board:calculateSpaceCenter(row, col)
 end
 
 function Board:addPiece(row, col, pieceColor)
-	local piece = Piece(self.spaceSize - 5, pieceColor)
+	local piece = Piece(self.spaceSize, pieceColor)
 	
 	local x, y = self:calculateSpaceCenter(row, col)
 	
 	piece:moveTo(x, y)
 	piece:add()
+end
+
+function Board:addCursor()	
+	self.cursor = Cursor(self.spaceSize)
+	self.cursor:add()
+end
+
+function Board:setCursor(row, col)		
+	local x, y = self:calculateSpaceCenter(row, col)
+	
+	self.cursor:moveTo(x, y)
 end
 

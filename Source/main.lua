@@ -26,10 +26,12 @@ function initGame()
 	board:addPiece(4, 3, 0)
 	board:addPiece(3, 3, 1)
 	board:addPiece(4, 4, 1)
+	board:addCursor()
 end
 
 -- Get the party started
 initGame()
+board:setCursor(2,2)
 
 -- Standard main game loop
 function playdate.update()

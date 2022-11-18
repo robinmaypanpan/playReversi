@@ -46,7 +46,7 @@ function Board:drawBoard()
 	return boardImage
 end
 
-function Board:calculatePiecePosition(row, col)
+function Board:calculateSpaceCenter(row, col)
 	local distanceFromCenterToEdge = ((self.numSpaces - 1 ) / 2) * self.spaceSize
 	local firstRowCenter = self.y - distanceFromCenterToEdge
 	local firstColCenter = self.x - distanceFromCenterToEdge
@@ -60,7 +60,7 @@ end
 function Board:addPiece(row, col, pieceColor)
 	local piece = Piece(self.spaceSize - 5, pieceColor)
 	
-	local x, y = self:calculatePiecePosition(row, col)
+	local x, y = self:calculateSpaceCenter(row, col)
 	
 	piece:moveTo(x, y)
 	piece:add()

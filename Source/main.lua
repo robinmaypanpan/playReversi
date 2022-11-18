@@ -38,3 +38,24 @@ function playdate.update()
 	gfx.sprite.update()
 	playdate.timer.updateTimers()
 end
+
+local rootInputHandlers = {
+	downButtonDown = function()
+		board:moveCursor(1,0)
+	end,
+	
+	upButtonDown = function()
+		board:moveCursor(-1,0)
+	end,
+	
+	rightButtonDown = function()
+		board:moveCursor(0,1)
+	end,
+	
+	leftButtonDown = function()
+		board:moveCursor(0,-1)
+	end,
+	
+}
+
+playdate.inputHandlers.push(rootInputHandlers)

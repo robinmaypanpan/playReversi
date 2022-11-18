@@ -5,6 +5,7 @@ local gfx = playdate.graphics
 
 import 'piece'
 import 'cursor'
+import 'helpers'
 
 class('Board').extends(gfx.sprite)
 
@@ -12,6 +13,8 @@ function Board:init(numSpaces, spaceSize)
 	Board.super.init(self)
 	self.numSpaces = numSpaces
 	self.spaceSize = spaceSize
+	self.cursorRow = -1
+	self.cursorCol = -1
 	
 	self:setImage(self:drawBoard())
 end
@@ -70,11 +73,24 @@ end
 function Board:addCursor()	
 	self.cursor = Cursor(self.spaceSize)
 	self.cursor:add()
+	self.cursorRow = -1
+	self.cursorCol = -1
 end
 
 function Board:setCursor(row, col)		
 	local x, y = self:calculateSpaceCenter(row, col)
 	
+	self.cursorRow = row
+	self.cursorCol = col
+	
 	self.cursor:moveTo(x, y)
+end
+
+function Board:moveCursor(deltaRow, deltaCol)
+	local row = self.cursorRow
+	local col = self.cursorCol
+	row = math.clamp(row + deltaRow, 0, self.numSpaces - 1)
+	col = math.clamp(col + deltaCol, 0, self.numSpaces - 1)
+	self:setCursor(row,col)	
 end
 

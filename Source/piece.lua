@@ -7,11 +7,12 @@ class('Piece').extends(gfx.sprite)
 
 function Piece:init(spaceSize, initialColor)
 	Piece.super.init(self)
+	assert(spaceSize > 0)
+	assert(initialColor == 1 or initialColor == 0)
 	self.pieceColor = initialColor
 	self.diameter = spaceSize - 5
 	
-	local pieceImage = self:drawPiece()
-	self:setImage(pieceImage)
+	self:setImage(self:drawPiece())
 end
 
 function Piece:drawPiece()
@@ -25,4 +26,13 @@ function Piece:drawPiece()
 		end
 	gfx.popContext()
 	return pieceImage
+end
+
+function Piece:flip()
+	if (self.pieceColor == 0) then
+		self.pieceColor = 1
+	else
+		self.pieceColor = 0
+	end
+	self:setImage(self:drawPiece())
 end

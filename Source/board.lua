@@ -13,10 +13,22 @@ function Board:init(numSpaces, spaceSize)
 	Board.super.init(self)
 	self.numSpaces = numSpaces
 	self.spaceSize = spaceSize
-	self.cursorRow = -1
-	self.cursorCol = -1
+	self.cursorRow = 0
+	self.cursorCol = 0
+	
+	self:createBoardData()
 	
 	self:setImage(self:drawBoard())
+end
+
+function Board:createBoardData()
+	self.data = {}
+	for i=1,self.numSpaces do
+		self.data[i] = {}
+		for j=1,self.numSpaces do
+			self.data[i][j] = nil
+		end
+	end
 end
 
 function Board:getBoardSize()
@@ -55,14 +67,16 @@ function Board:calculateSpaceCenter(row, col)
 	local firstRowCenter = self.y - distanceFromCenterToEdge
 	local firstColCenter = self.x - distanceFromCenterToEdge
 	
-	local y = firstRowCenter + row * self.spaceSize + 1
-	local x = firstColCenter + col * self.spaceSize + 1
+	local y = firstRowCenter + (row - 1) * self.spaceSize + 1
+	local x = firstColCenter + (col - 1) * self.spaceSize + 1
 	
 	return x,y
 end
 
 function Board:addPiece(row, col, pieceColor)
 	local piece = Piece(self.spaceSize, pieceColor)
+	
+	self.data[row][col] = piece
 	
 	local x, y = self:calculateSpaceCenter(row, col)
 	
@@ -73,8 +87,8 @@ end
 function Board:addCursor()	
 	self.cursor = Cursor(self.spaceSize)
 	self.cursor:add()
-	self.cursorRow = -1
-	self.cursorCol = -1
+	self.cursorRow = 0
+	self.cursorCol = 0
 end
 
 function Board:setCursor(row, col)		
@@ -89,8 +103,31 @@ end
 function Board:moveCursor(deltaRow, deltaCol)
 	local row = self.cursorRow
 	local col = self.cursorCol
-	row = math.clamp(row + deltaRow, 0, self.numSpaces - 1)
-	col = math.clamp(col + deltaCol, 0, self.numSpaces - 1)
+	row = math.clamp(row + deltaRow, 1, self.numSpaces)
+	col = math.clamp(col + deltaCol, 1, self.numSpaces)
 	self:setCursor(row,col)	
 end
 
+function Board:getPieceAtCursor()
+	if (self.cursorRow > 0 and self.cursorCol > 0) then
+		return self.data[self.cursorRow][self.cursorCol]
+	else
+		return nil
+	end
+end
+
+function Board:hasPieceAtCursor()
+	local piece = self:getPieceAtCursor()
+	return piece ~= nil
+end
+
+function Board:flipPieceAtCursor()
+	local piece = self:getPieceAtCursor()
+	if piece ~= nil then
+		piece:flip()
+	end
+end
+
+function Board:addPieceAtCursor(pieceColor)
+	self:addPiece(self.cursorRow, self.cursorCol, pieceColor)
+end

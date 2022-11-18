@@ -9,7 +9,7 @@ local gfx = playdate.graphics
 
 function setupBoard()
 	local numSpaces = 8
-	local spaceSize = 25
+	local spaceSize = 29
 	
 	board = Board(numSpaces, spaceSize)
 	
@@ -22,10 +22,10 @@ end
 
 function initGame()
 	setupBoard()
-	board:addPiece(3, 4, 0)
-	board:addPiece(4, 3, 0)
-	board:addPiece(3, 3, 1)
+	board:addPiece(4, 5, 0)
+	board:addPiece(5, 4, 0)
 	board:addPiece(4, 4, 1)
+	board:addPiece(5, 5, 1)
 	board:addCursor()
 end
 
@@ -55,6 +55,14 @@ local rootInputHandlers = {
 	leftButtonDown = function()
 		board:moveCursor(0,-1)
 	end,
+	
+	AButtonDown = function()
+		if board:hasPieceAtCursor() then
+			board:flipPieceAtCursor()
+		else 
+			board:addPieceAtCursor(0)
+		end
+	end
 	
 }
 

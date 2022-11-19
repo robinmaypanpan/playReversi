@@ -15,10 +15,23 @@ function Board:init(numSpaces, spaceSize)
 	self.spaceSize = spaceSize
 	self.cursorRow = 0
 	self.cursorCol = 0
+	self.padding = 5
 	
 	self:createBoardData()
 	
 	self:setImage(self:drawBoard())
+end
+
+function Board:clearBoard()
+	for i=1,self.numSpaces do
+		for j=1,self.numSpaces do
+			if (self.data[i][j]) then
+				self.data[i][j]:remove()
+			end
+			self.data[i][j] = nil
+		end
+	end
+	
 end
 
 function Board:createBoardData()
@@ -37,7 +50,8 @@ end
 
 function Board:drawBoard()
 	local boardSize = self:getBoardSize()
-	local boardImage = gfx.image.new(boardSize, boardSize)
+	local boardImage = gfx.image.new(boardSize+10, boardSize+10)
+	local padding = self.padding;
 	gfx.pushContext(boardImage)
 		gfx.setColor(gfx.kColorBlack)
 		
@@ -45,19 +59,23 @@ function Board:drawBoard()
 		gfx.setLineWidth(1)
 		
 		-- Draw the vertical lines first
-		for col = 1, self.numSpaces do
-			gfx.drawLine(col*self.spaceSize, 0, col*self.spaceSize, self.numSpaces*self.spaceSize)
+		for col = 1, self.numSpaces - 1 do
+			gfx.drawLine(
+				padding + col*self.spaceSize, padding, 
+				padding + col*self.spaceSize, padding + self.numSpaces*self.spaceSize)
 		end
 		
 		-- Now draw the horizontal lines
-		for row = 1, self.numSpaces do
-			gfx.drawLine(0, row*self.spaceSize, self.numSpaces*self.spaceSize, row*self.spaceSize)
+		for row = 1, self.numSpaces - 1 do
+			gfx.drawLine(
+				padding, padding + row*self.spaceSize, 
+				padding + self.numSpaces*self.spaceSize, padding + row*self.spaceSize)
 		end
 		
 		-- Draw an outline around the entire board	
 		local boardSize = self:getBoardSize()
 		gfx.setLineWidth(3)
-		gfx.drawRect(0, 0, boardSize, boardSize)
+		gfx.drawRect(padding - 1, padding - 1, boardSize +1, boardSize+1)
 	gfx.popContext()
 	return boardImage
 end

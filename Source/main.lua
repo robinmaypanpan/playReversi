@@ -20,20 +20,20 @@ function setupBoard()
 	board:add()
 end
 
-function setupPieces()
+function initializeGameState()
 	board:addPiece(4, 5, 0)
 	board:addPiece(5, 4, 0)
 	board:addPiece(4, 4, 1)
 	board:addPiece(5, 5, 1)
+	
+	currentPlayer = 0
 end
 	
 
 function setupGame()
 	setupBoard()
-	setupPieces()
+	initializeGameState()
 	board:addCursor()
-	
-	currentPlayer = 0
 end
 
 -- Get the party started
@@ -78,3 +78,8 @@ local rootInputHandlers = {
 }
 
 playdate.inputHandlers.push(rootInputHandlers)
+
+local menuItem,error = playdate:getSystemMenu():addMenuItem("Restart Game", function()
+	board:clearBoard()
+	initializeGameState()
+end)

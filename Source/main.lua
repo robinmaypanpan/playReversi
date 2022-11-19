@@ -20,17 +20,24 @@ function setupBoard()
 	board:add()
 end
 
-function initGame()
-	setupBoard()
+function setupPieces()
 	board:addPiece(4, 5, 0)
 	board:addPiece(5, 4, 0)
 	board:addPiece(4, 4, 1)
 	board:addPiece(5, 5, 1)
+end
+	
+
+function setupGame()
+	setupBoard()
+	setupPieces()
 	board:addCursor()
+	
+	currentPlayer = 0
 end
 
 -- Get the party started
-initGame()
+setupGame()
 board:setCursor(2,2)
 
 -- Standard main game loop
@@ -60,10 +67,14 @@ local rootInputHandlers = {
 		if board:hasPieceAtCursor() then
 			board:flipPieceAtCursor()
 		else 
-			board:addPieceAtCursor(0)
+			board:addPieceAtCursor(currentPlayer)
+		end
+		if (currentPlayer == 1) then 
+			currentPlayer = 0 
+		else 
+			currentPlayer = 1
 		end
 	end
-	
 }
 
 playdate.inputHandlers.push(rootInputHandlers)

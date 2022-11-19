@@ -60,7 +60,12 @@ function Board:drawBoard()
 	gfx.pushContext(boardImage)
 		gfx.setColor(gfx.kColorBlack)
 		
+		-- Draw the board background
+		gfx.setDitherPattern(0.99)
+		gfx.fillRect(padding, padding, boardSize, boardSize)
+		
 		-- Draw the board squares
+		gfx.setDitherPattern(0)
 		gfx.setLineWidth(1)
 		gfx.setStrokeLocation(gfx.kStrokeCentered)
 		
@@ -68,14 +73,14 @@ function Board:drawBoard()
 		for col = 1, self.numSpaces - 1 do
 			gfx.drawLine(
 				padding + col*self.spaceSize, padding, 
-				padding + col*self.spaceSize, padding + self.numSpaces*self.spaceSize)
+				padding + col*self.spaceSize, padding + boardSize)
 		end
 		
 		-- Now draw the horizontal lines
 		for row = 1, self.numSpaces - 1 do
 			gfx.drawLine(
 				padding, padding + row*self.spaceSize, 
-				padding + self.numSpaces*self.spaceSize, padding + row*self.spaceSize)
+				padding + boardSize, padding + row*self.spaceSize)
 		end
 		
 		-- Draw an outline around the entire board	
@@ -117,6 +122,7 @@ function Board:canMoveTo(row, col, pieceColor)
 		return false 
 	end
 
+	return true
 end
 
 -- Adds a cursor to the board

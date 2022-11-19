@@ -18,7 +18,7 @@ function Cursor:drawCursor()
 		gfx.setColor(gfx.kColorBlack)
 		
 		if (self.isValid == false) then
-			gfx.setDitherPattern(0.8)
+			gfx.setDitherPattern(0.4)
 			gfx.fillRect(0,0,cursorSize, cursorSize)
 		end
 		

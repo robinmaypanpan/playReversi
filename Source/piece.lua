@@ -18,10 +18,14 @@ end
 function Piece:drawPiece()
 	local pieceImage = gfx.image.new(self.diameter, self.diameter)
 	gfx.pushContext(pieceImage)
-		gfx.setColor(gfx.kColorBlack)
+		gfx.setDitherPattern(0)
 		if (self.pieceColor == 0) then
+			gfx.setColor(gfx.kColorBlack)
 			gfx.fillCircleInRect(0, 0, self.diameter, self.diameter)
 		else
+			gfx.setColor(gfx.kColorWhite)
+			gfx.fillCircleAtPoint(0, 0, self.diameter, self.diameter)
+			gfx.setColor(gfx.kColorBlack)
 			gfx.drawCircleInRect(0, 0, self.diameter, self.diameter)
 		end
 	gfx.popContext()

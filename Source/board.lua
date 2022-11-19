@@ -132,8 +132,11 @@ function Board:addPiece(location, pieceColor)
 end
 
 -- Return a boolean indicating whether the row, col space can be moved to
-function Board:canMoveTo(location, pieceColor)
+function Board:canPlacePieceAt(location, pieceColor)
+	assert(location ~= nil)
+	assert(pieceColor ~= nil)
 	local row,col = location:unpack()
+	print('\nChecking to see if we can move ' .. pieceColor .. ' to ' .. row .. ',' .. col)
 	-- You can't move onto spaces that already have pieces
 	if (self.data[row][col] ~= nil) then 
 		return false 
@@ -143,13 +146,32 @@ function Board:canMoveTo(location, pieceColor)
 	local opponentColor = invertColor(pieceColor)
 	
 	-- Look in every direction for a valid move
-	--[[
-	for _,direction in directions do
-		local firstSpace
+	for _,direction in pairs(directions) do
+		local dx,dy = direction:unpack()
+		print('Looking in direction' .. dx .. ',' .. dy)
+		local foundAnOpponentPiece = false
+		local nextLocation = location
+		local piece
+		repeat
+			nextLocation = nextLocation + direction
+			local x,y = nextLocation:unpack()
+			print('Next location to look at is ' .. x .. ',' .. y)
+			piece = board:getPieceAt(nextLocation)
+			if (piece and piece.pieceColor == opponentColor) then
+				foundAnOpponentPiece = true
+			end
+		until piece == nil or piece.pieceColor == pieceColor
+		
+		-- If we found at least one opponent piece AND we ended on one of our own pieces, we're good
+		if (foundAnOpponentPiece and piece ~= nil and piece.pieceColor == pieceColor) then
+			print('We did it! We found a valid move!')
+			return true
+		end
+		print('No dice in this direction')
 	end
-	]]--
 
-	return true
+	-- If we look in every direction and find nothing, we're hosed
+	return false
 end
 
 -- Adds a cursor to the board
@@ -175,23 +197,29 @@ function Board:moveCursor(delta, currentPlayer)
 	local newPosition = self.cursorPosition + delta
 	if (board:isOnBoard(newPosition)) then
 		self:setCursor(newPosition)	
-		self.cursor:setValidPosition(self:canMoveToCursor(currentPlayer))
+		self.cursor:setValidPosition(self:canPlacePieceAtCursor(currentPlayer))
 	end
 end
 
+-- Returns true if the provided location is actually on the board
 function Board:isOnBoard(location)
 	return location.x >= 1 and location.x <= self.numSpaces
 		and location.y >= 1 and location.y <= self.numSpaces
 end
 
--- Returns the piece at the cursor
-function Board:getPieceAtCursor()
-	if (self:isOnBoard(self.cursorPosition)) then
-		local row,col = self.cursorPosition:unpack()
+-- Return the piece at a given location
+function Board:getPieceAt(location)
+	if (self:isOnBoard(location)) then
+		local row,col = location:unpack()
 		return self.data[row][col]
 	else
 		return nil
 	end
+end
+
+-- Returns the piece at the cursor
+function Board:getPieceAtCursor()
+	return self:getPieceAt(self.cursorPosition)
 end
 
 -- Returns true if theres a piece under the cursor
@@ -214,6 +242,6 @@ function Board:addPieceAtCursor(pieceColor)
 end
 
 -- Returns true if you can make a move at the cursor
-function Board:canMoveToCursor(pieceColor)
-	return self:canMoveTo(self.cursorPosition, pieceColor)
+function Board:canPlacePieceAtCursor(pieceColor)
+	return self:canPlacePieceAt(self.cursorPosition, pieceColor)
 end

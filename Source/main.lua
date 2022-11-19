@@ -65,7 +65,7 @@ local rootInputHandlers = {
 	end,
 	
 	AButtonDown = function()
-		if board:canMoveToCursor(pieceColor) then
+		if (board:canPlacePieceAtCursor(currentPlayer)) then
 			board:addPieceAtCursor(currentPlayer)
 		end
 		

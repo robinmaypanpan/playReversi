@@ -27,7 +27,7 @@ function initializeGameState()
 	board:addPiece(point.new(4, 4), 1)
 	board:addPiece(point.new(5, 5), 1)
 	
-	currentPlayer = 0
+	currentPlayer = 1
 end
 	
 
@@ -39,7 +39,7 @@ end
 
 -- Get the party started
 setupGame()
-board:setCursor(point.new(2,2))
+board:setCursor(point.new(2,2), currentPlayer)
 
 -- Standard main game loop
 function playdate.update()
@@ -66,10 +66,9 @@ local rootInputHandlers = {
 	
 	AButtonDown = function()
 		if (board:canPlacePieceAtCursor(currentPlayer)) then
-			board:addPieceAtCursor(currentPlayer)
+			board:placePieceAtCursor(currentPlayer)			
+			currentPlayer = invertColor(currentPlayer)
 		end
-		
-		currentPlayer = invertColor(currentPlayer)
 	end
 }
 

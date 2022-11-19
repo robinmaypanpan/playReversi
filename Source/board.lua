@@ -131,47 +131,112 @@ function Board:addPiece(location, pieceColor)
 	piece:add()
 end
 
+-- Returns true if we can flip all the pieces in the direction from the location in that direction
+function Board:canFlipInDirection(location, direction, centerColor)
+	assert(location ~= nil)
+	assert(direction ~= nil)
+	
+	-- Start by grabbing our starting point information	
+	local opponentColor = invertColor(centerColor)
+	
+	-- Initialize our loop variables
+	local foundAnOpponentPiece = false
+	local nextLocation = location
+	local piece
+	
+	-- start looping
+	repeat
+		nextLocation = nextLocation + direction
+		piece = board:getPieceAt(nextLocation)
+		if (piece and piece.pieceColor == opponentColor) then
+			foundAnOpponentPiece = true
+		end
+	until piece == nil or piece.pieceColor == centerColor
+	
+	-- If we found at least one opponent piece AND we ended on one of our own pieces, we're good
+	if (foundAnOpponentPiece and piece ~= nil and piece.pieceColor == centerColor) then
+		return true
+	end
+	
+	return false
+end
+
+-- Flips all the pieces in the direction indicated so they match the endpoints
+function Board:flipInDirection(location, direction) 
+	assert(location ~= nil)
+	assert(direction ~= nil)
+	
+	-- Start by grabbing our starting point information	
+	local row,col = location:unpack()
+	local centerPiece = self.data[row][col]	
+	assert(centerPiece ~= nil)
+	
+	local centerColor = centerPiece.pieceColor	
+	local opponentColor = invertColor(centerColor)	
+	
+	-- Initialize our loop variables
+	local foundAnOpponentPiece = false
+	local nextLocation = location
+	local piece
+	local pieceColor
+	
+	-- start looping
+	repeat
+		nextLocation = nextLocation + direction
+		piece = board:getPieceAt(nextLocation)
+		pieceColor = piece.pieceColor
+		if (piece and piece.pieceColor == opponentColor) then
+			piece:flip()
+		end
+	until piece == nil or pieceColor == centerColor	
+end
+
 -- Return a boolean indicating whether the row, col space can be moved to
 function Board:canPlacePieceAt(location, pieceColor)
 	assert(location ~= nil)
 	assert(pieceColor ~= nil)
+	
 	local row,col = location:unpack()
-	print('\nChecking to see if we can move ' .. pieceColor .. ' to ' .. row .. ',' .. col)
 	-- You can't move onto spaces that already have pieces
 	if (self.data[row][col] ~= nil) then 
 		return false 
 	end
 	
-	-- Store the opponent color
-	local opponentColor = invertColor(pieceColor)
-	
 	-- Look in every direction for a valid move
 	for _,direction in pairs(directions) do
-		local dx,dy = direction:unpack()
-		print('Looking in direction' .. dx .. ',' .. dy)
-		local foundAnOpponentPiece = false
-		local nextLocation = location
-		local piece
-		repeat
-			nextLocation = nextLocation + direction
-			local x,y = nextLocation:unpack()
-			print('Next location to look at is ' .. x .. ',' .. y)
-			piece = board:getPieceAt(nextLocation)
-			if (piece and piece.pieceColor == opponentColor) then
-				foundAnOpponentPiece = true
-			end
-		until piece == nil or piece.pieceColor == pieceColor
-		
-		-- If we found at least one opponent piece AND we ended on one of our own pieces, we're good
-		if (foundAnOpponentPiece and piece ~= nil and piece.pieceColor == pieceColor) then
-			print('We did it! We found a valid move!')
+		if (self:canFlipInDirection(location, direction, pieceColor)) then
 			return true
 		end
-		print('No dice in this direction')
 	end
 
 	-- If we look in every direction and find nothing, we're hosed
 	return false
+end
+
+-- Flips all of the pieces around the indicated location that can and should be flipped
+-- Usually called right after to place a piece.
+-- Should be replaced by a crank action to flip all the pieces.
+function Board:flipPiecesAround(location)	
+	assert(location ~= nil)
+	local row,col = location:unpack()
+	
+	-- Start by grabbing a bunch of our pieces
+	local centerPiece = self.data[row][col]	
+	local centerColor = centerPiece.pieceColor	
+	local opponentColor = invertColor(pieceColor)
+	
+	-- First find all the valid directions to look in
+	local validDirections = {}
+	for _,direction in pairs(directions) do
+		if (self:canFlipInDirection(location, direction, centerColor)) then
+			table.insert(validDirections, direction)
+		end
+	end
+	
+	-- Now do the actual flips
+	for _,direction in pairs(validDirections) do
+		self:flipInDirection(location, direction)
+	end
 end
 
 -- Adds a cursor to the board
@@ -185,19 +250,20 @@ function Board:addCursor()
 end
 
 -- Sets the position of the cursor
-function Board:setCursor(newLocation)			
+function Board:setCursor(newLocation, currentPlayer)	
+	assert(self:isOnBoard(newLocation))	
 	self.cursorPosition = newLocation
 	local newScreenPosition = self:calculateSpaceCenter(newLocation)	
 	local x,y = newScreenPosition:unpack()
 	self.cursor:moveTo(x,y)
+	self.cursor:setValidPosition(self:canPlacePieceAtCursor(currentPlayer))
 end
 
 -- Moves the cursor to a position indicated by the inputs
 function Board:moveCursor(delta, currentPlayer)
 	local newPosition = self.cursorPosition + delta
 	if (board:isOnBoard(newPosition)) then
-		self:setCursor(newPosition)	
-		self.cursor:setValidPosition(self:canPlacePieceAtCursor(currentPlayer))
+		self:setCursor(newPosition, currentPlayer)	
 	end
 end
 
@@ -236,9 +302,10 @@ function Board:flipPieceAtCursor()
 	end
 end
 
--- Adds a piece at the current cursor position
-function Board:addPieceAtCursor(pieceColor)
+-- Places a piece at the current cursor position
+function Board:placePieceAtCursor(pieceColor)
 	self:addPiece(self.cursorPosition, pieceColor)
+	self:flipPiecesAround(self.cursorPosition)
 end
 
 -- Returns true if you can make a move at the cursor

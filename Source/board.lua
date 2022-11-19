@@ -1,5 +1,6 @@
 import "CoreLibs/object"
 import 'CoreLibs/sprites'
+import "CoreLibs/graphics"
 
 local gfx = playdate.graphics
 
@@ -61,6 +62,7 @@ function Board:drawBoard()
 		
 		-- Draw the board squares
 		gfx.setLineWidth(1)
+		gfx.setStrokeLocation(gfx.kStrokeCentered)
 		
 		-- Draw the vertical lines first
 		for col = 1, self.numSpaces - 1 do
@@ -78,8 +80,9 @@ function Board:drawBoard()
 		
 		-- Draw an outline around the entire board	
 		local boardSize = self:getBoardSize()
+		gfx.setStrokeLocation(gfx.kStrokeOutside)
 		gfx.setLineWidth(3)
-		gfx.drawRect(padding - 1, padding - 1, boardSize +1, boardSize+1)
+		gfx.drawRect(padding, padding, boardSize, boardSize)
 	gfx.popContext()
 	return boardImage
 end
@@ -108,6 +111,14 @@ function Board:addPiece(row, col, pieceColor)
 	piece:add()
 end
 
+-- Return a boolean indicating whether the row, col space can be moved to
+function Board:canMoveTo(row, col, pieceColor)
+	if (self.data[row][col] ~= nil) then 
+		return false 
+	end
+
+end
+
 -- Adds a cursor to the board
 function Board:addCursor()	
 	if (self.cursor) then
@@ -130,12 +141,13 @@ function Board:setCursor(row, col)
 end
 
 -- Moves the cursor to a position indicated by the inputs
-function Board:moveCursor(deltaRow, deltaCol)
+function Board:moveCursor(deltaRow, deltaCol, currentPlayer)
 	local row = self.cursorRow
 	local col = self.cursorCol
 	row = math.clamp(row + deltaRow, 1, self.numSpaces)
 	col = math.clamp(col + deltaCol, 1, self.numSpaces)
 	self:setCursor(row,col)	
+	self.cursor:setValidPosition(self:canMoveToCursor(currentPlayer))
 end
 
 -- Returns the piece at the cursor
@@ -164,4 +176,9 @@ end
 -- Adds a piece at the current cursor position
 function Board:addPieceAtCursor(pieceColor)
 	self:addPiece(self.cursorRow, self.cursorCol, pieceColor)
+end
+
+-- Returns true if you can make a move at the cursor
+function Board:canMoveToCursor(pieceColor)
+	return self:canMoveTo(self.cursorRow, self.cursorCol, pieceColor)
 end

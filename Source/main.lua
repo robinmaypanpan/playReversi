@@ -48,27 +48,26 @@ end
 
 local rootInputHandlers = {
 	downButtonDown = function()
-		board:moveCursor(1,0)
+		board:moveCursor(1,0, currentPlayer)
 	end,
 	
 	upButtonDown = function()
-		board:moveCursor(-1,0)
+		board:moveCursor(-1,0, currentPlayer)
 	end,
 	
 	rightButtonDown = function()
-		board:moveCursor(0,1)
+		board:moveCursor(0,1, currentPlayer)
 	end,
 	
 	leftButtonDown = function()
-		board:moveCursor(0,-1)
+		board:moveCursor(0,-1, currentPlayer)
 	end,
 	
 	AButtonDown = function()
-		if board:hasPieceAtCursor() then
-			board:flipPieceAtCursor()
-		else 
+		if board:canMoveToCursor(pieceColor) then
 			board:addPieceAtCursor(currentPlayer)
 		end
+		
 		if (currentPlayer == 1) then 
 			currentPlayer = 0 
 		else 

@@ -1,6 +1,8 @@
 import "CoreLibs/object"
 import 'CoreLibs/sprites'
 
+import 'helpers'
+
 local gfx = playdate.graphics
 
 class('Piece').extends(gfx.sprite)
@@ -33,10 +35,6 @@ function Piece:drawPiece()
 end
 
 function Piece:flip()
-	if (self.pieceColor == 0) then
-		self.pieceColor = 1
-	else
-		self.pieceColor = 0
-	end
+	self.pieceColor = invertColor(self.pieceColor)
 	self:setImage(self:drawPiece())
 end

@@ -9,6 +9,7 @@ function Cursor:init(spaceSize)
 	Cursor.super.init(self)
 	self.spaceSize = spaceSize;
 	self:setImage(self:drawCursor())
+	self:setZIndex(20)
 end
 
 function Cursor:drawCursor()

@@ -6,6 +6,7 @@ import "CoreLibs/timer"
 import "board"
 
 local gfx = playdate.graphics
+local point = playdate.geometry.vector2D
 
 function setupBoard()
 	local numSpaces = 8
@@ -21,10 +22,10 @@ function setupBoard()
 end
 
 function initializeGameState()
-	board:addPiece(4, 5, 0)
-	board:addPiece(5, 4, 0)
-	board:addPiece(4, 4, 1)
-	board:addPiece(5, 5, 1)
+	board:addPiece(point.new(4, 5), 0)
+	board:addPiece(point.new(5, 4), 0)
+	board:addPiece(point.new(4, 4), 1)
+	board:addPiece(point.new(5, 5), 1)
 	
 	currentPlayer = 0
 end
@@ -38,7 +39,7 @@ end
 
 -- Get the party started
 setupGame()
-board:setCursor(2,2)
+board:setCursor(point.new(2,2))
 
 -- Standard main game loop
 function playdate.update()
@@ -48,19 +49,19 @@ end
 
 local rootInputHandlers = {
 	downButtonDown = function()
-		board:moveCursor(1,0, currentPlayer)
+		board:moveCursor(point.new(1,0), currentPlayer)
 	end,
 	
 	upButtonDown = function()
-		board:moveCursor(-1,0, currentPlayer)
+		board:moveCursor(point.new(-1,0), currentPlayer)
 	end,
 	
 	rightButtonDown = function()
-		board:moveCursor(0,1, currentPlayer)
+		board:moveCursor(point.new(0,1), currentPlayer)
 	end,
 	
 	leftButtonDown = function()
-		board:moveCursor(0,-1, currentPlayer)
+		board:moveCursor(point.new(0,-1), currentPlayer)
 	end,
 	
 	AButtonDown = function()
@@ -68,11 +69,7 @@ local rootInputHandlers = {
 			board:addPieceAtCursor(currentPlayer)
 		end
 		
-		if (currentPlayer == 1) then 
-			currentPlayer = 0 
-		else 
-			currentPlayer = 1
-		end
+		currentPlayer = invertColor(currentPlayer)
 	end
 }
 

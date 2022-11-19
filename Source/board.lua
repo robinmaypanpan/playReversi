@@ -2,20 +2,32 @@ import "CoreLibs/object"
 import 'CoreLibs/sprites'
 import "CoreLibs/graphics"
 
-local gfx = playdate.graphics
-
 import 'piece'
 import 'cursor'
 import 'helpers'
 
+local gfx = playdate.graphics
+local point = playdate.geometry.vector2D
+
 class('Board').extends(gfx.sprite)
+
+-- A helpful list of all possible directions
+local directions = {
+	point.new(-1,-1),
+	point.new(-1,0),
+	point.new(-1,1),
+	point.new(0,-1),
+	point.new(0,1),
+	point.new(1,-1),
+	point.new(1,0),
+	point.new(1,1)
+}
 
 function Board:init(numSpaces, spaceSize)
 	Board.super.init(self)
 	self.numSpaces = numSpaces
 	self.spaceSize = spaceSize
-	self.cursorRow = 0
-	self.cursorCol = 0
+	self.cursorPosition = point.new(0,0)
 	self.padding = 5
 	
 	self:createBoardData()
@@ -93,34 +105,49 @@ function Board:drawBoard()
 end
 
 -- Calculates the center x,y coordinates of the indicated row,col space
-function Board:calculateSpaceCenter(row, col)
+function Board:calculateSpaceCenter(rcLocation)
+	local row, col = rcLocation:unpack()
 	local distanceFromCenterToEdge = ((self.numSpaces - 1 ) / 2) * self.spaceSize
+	
 	local firstRowCenter = self.y - distanceFromCenterToEdge
 	local firstColCenter = self.x - distanceFromCenterToEdge
 	
 	local y = firstRowCenter + (row - 1) * self.spaceSize + 1
 	local x = firstColCenter + (col - 1) * self.spaceSize + 1
 	
-	return x,y
+	return point.new(x,y)
 end
 
 -- adds a piece at the indicated location
-function Board:addPiece(row, col, pieceColor)
+function Board:addPiece(location, pieceColor)
+	local row,col = location:unpack()
 	local piece = Piece(self.spaceSize, pieceColor)
 	
 	self.data[row][col] = piece
 	
-	local x, y = self:calculateSpaceCenter(row, col)
+	local x, y = self:calculateSpaceCenter(location):unpack()
 	
 	piece:moveTo(x, y)
 	piece:add()
 end
 
 -- Return a boolean indicating whether the row, col space can be moved to
-function Board:canMoveTo(row, col, pieceColor)
+function Board:canMoveTo(location, pieceColor)
+	local row,col = location:unpack()
+	-- You can't move onto spaces that already have pieces
 	if (self.data[row][col] ~= nil) then 
 		return false 
 	end
+	
+	-- Store the opponent color
+	local opponentColor = invertColor(pieceColor)
+	
+	-- Look in every direction for a valid move
+	--[[
+	for _,direction in directions do
+		local firstSpace
+	end
+	]]--
 
 	return true
 end
@@ -132,34 +159,36 @@ function Board:addCursor()
 	end
 	self.cursor = Cursor(self.spaceSize)
 	self.cursor:add()
-	self.cursorRow = 0
-	self.cursorCol = 0
+	self.cursorPosition = point.new(0,0)
 end
 
 -- Sets the position of the cursor
-function Board:setCursor(row, col)		
-	local x, y = self:calculateSpaceCenter(row, col)
-	
-	self.cursorRow = row
-	self.cursorCol = col
-	
-	self.cursor:moveTo(x, y)
+function Board:setCursor(newLocation)			
+	self.cursorPosition = newLocation
+	local newScreenPosition = self:calculateSpaceCenter(newLocation)	
+	local x,y = newScreenPosition:unpack()
+	self.cursor:moveTo(x,y)
 end
 
 -- Moves the cursor to a position indicated by the inputs
-function Board:moveCursor(deltaRow, deltaCol, currentPlayer)
-	local row = self.cursorRow
-	local col = self.cursorCol
-	row = math.clamp(row + deltaRow, 1, self.numSpaces)
-	col = math.clamp(col + deltaCol, 1, self.numSpaces)
-	self:setCursor(row,col)	
-	self.cursor:setValidPosition(self:canMoveToCursor(currentPlayer))
+function Board:moveCursor(delta, currentPlayer)
+	local newPosition = self.cursorPosition + delta
+	if (board:isOnBoard(newPosition)) then
+		self:setCursor(newPosition)	
+		self.cursor:setValidPosition(self:canMoveToCursor(currentPlayer))
+	end
+end
+
+function Board:isOnBoard(location)
+	return location.x >= 1 and location.x <= self.numSpaces
+		and location.y >= 1 and location.y <= self.numSpaces
 end
 
 -- Returns the piece at the cursor
 function Board:getPieceAtCursor()
-	if (self.cursorRow > 0 and self.cursorCol > 0) then
-		return self.data[self.cursorRow][self.cursorCol]
+	if (self:isOnBoard(self.cursorPosition)) then
+		local row,col = self.cursorPosition:unpack()
+		return self.data[row][col]
 	else
 		return nil
 	end
@@ -181,10 +210,10 @@ end
 
 -- Adds a piece at the current cursor position
 function Board:addPieceAtCursor(pieceColor)
-	self:addPiece(self.cursorRow, self.cursorCol, pieceColor)
+	self:addPiece(self.cursorPosition, pieceColor)
 end
 
 -- Returns true if you can make a move at the cursor
 function Board:canMoveToCursor(pieceColor)
-	return self:canMoveTo(self.cursorRow, self.cursorCol, pieceColor)
+	return self:canMoveTo(self.cursorPosition, pieceColor)
 end

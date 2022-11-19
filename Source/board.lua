@@ -22,6 +22,7 @@ function Board:init(numSpaces, spaceSize)
 	self:setImage(self:drawBoard())
 end
 
+-- Removes everything from the board
 function Board:clearBoard()
 	for i=1,self.numSpaces do
 		for j=1,self.numSpaces do
@@ -34,6 +35,7 @@ function Board:clearBoard()
 	
 end
 
+-- Creates the initial data to put on the board
 function Board:createBoardData()
 	self.data = {}
 	for i=1,self.numSpaces do
@@ -44,10 +46,12 @@ function Board:createBoardData()
 	end
 end
 
+-- Returns the full size of the board
 function Board:getBoardSize()
 	return self.numSpaces * self.spaceSize;
 end
 
+-- Draws the basic board image and returns that image
 function Board:drawBoard()
 	local boardSize = self:getBoardSize()
 	local boardImage = gfx.image.new(boardSize+10, boardSize+10)
@@ -80,6 +84,7 @@ function Board:drawBoard()
 	return boardImage
 end
 
+-- Calculates the center x,y coordinates of the indicated row,col space
 function Board:calculateSpaceCenter(row, col)
 	local distanceFromCenterToEdge = ((self.numSpaces - 1 ) / 2) * self.spaceSize
 	local firstRowCenter = self.y - distanceFromCenterToEdge
@@ -91,6 +96,7 @@ function Board:calculateSpaceCenter(row, col)
 	return x,y
 end
 
+-- adds a piece at the indicated location
 function Board:addPiece(row, col, pieceColor)
 	local piece = Piece(self.spaceSize, pieceColor)
 	
@@ -102,13 +108,18 @@ function Board:addPiece(row, col, pieceColor)
 	piece:add()
 end
 
+-- Adds a cursor to the board
 function Board:addCursor()	
+	if (self.cursor) then
+		self.cursor.remove()
+	end
 	self.cursor = Cursor(self.spaceSize)
 	self.cursor:add()
 	self.cursorRow = 0
 	self.cursorCol = 0
 end
 
+-- Sets the position of the cursor
 function Board:setCursor(row, col)		
 	local x, y = self:calculateSpaceCenter(row, col)
 	
@@ -118,6 +129,7 @@ function Board:setCursor(row, col)
 	self.cursor:moveTo(x, y)
 end
 
+-- Moves the cursor to a position indicated by the inputs
 function Board:moveCursor(deltaRow, deltaCol)
 	local row = self.cursorRow
 	local col = self.cursorCol
@@ -126,6 +138,7 @@ function Board:moveCursor(deltaRow, deltaCol)
 	self:setCursor(row,col)	
 end
 
+-- Returns the piece at the cursor
 function Board:getPieceAtCursor()
 	if (self.cursorRow > 0 and self.cursorCol > 0) then
 		return self.data[self.cursorRow][self.cursorCol]
@@ -134,11 +147,13 @@ function Board:getPieceAtCursor()
 	end
 end
 
+-- Returns true if theres a piece under the cursor
 function Board:hasPieceAtCursor()
 	local piece = self:getPieceAtCursor()
 	return piece ~= nil
 end
 
+-- Flips the piece at the cursor, assuming there is one
 function Board:flipPieceAtCursor()
 	local piece = self:getPieceAtCursor()
 	if piece ~= nil then
@@ -146,6 +161,7 @@ function Board:flipPieceAtCursor()
 	end
 end
 
+-- Adds a piece at the current cursor position
 function Board:addPieceAtCursor(pieceColor)
 	self:addPiece(self.cursorRow, self.cursorCol, pieceColor)
 end

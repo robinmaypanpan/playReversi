@@ -3,4 +3,4 @@ author=Robin Mayorga
 description=Basic Reversi game
 bundleID=com.artless-entertainment.reversi
 version=0.1
-buildNumber=1
+buildNumber=2

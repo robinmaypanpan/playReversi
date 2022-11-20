@@ -8,9 +8,17 @@ import "board"
 local gfx = playdate.graphics
 local point = playdate.geometry.vector2D
 
+-- Game state
+local board
+local currentPlayer
+local upTimer
+local downTimer
+local leftTimer
+local rightTimer
+
 function setupBoard()
 	local numSpaces = 8
-	local spaceSize = 29
+	local spaceSize = 27
 	
 	board = Board(numSpaces, spaceSize)
 	
@@ -48,20 +56,56 @@ function playdate.update()
 end
 
 local rootInputHandlers = {
-	downButtonDown = function()
-		board:moveCursor(point.new(1,0), currentPlayer)
+	downButtonDown = function()	
+		local function timerCallback()
+			board:moveCursor(point.new(1,0), currentPlayer)
+		end
+		downTimer = playdate.timer.keyRepeatTimer(timerCallback)
+	end,
+	
+	downButtonUp = function()	
+		if (downTimer) then
+			downTimer:remove()
+		end
 	end,
 	
 	upButtonDown = function()
-		board:moveCursor(point.new(-1,0), currentPlayer)
+		local function timerCallback()
+			board:moveCursor(point.new(-1,0), currentPlayer)
+		end
+		upTimer = playdate.timer.keyRepeatTimer(timerCallback)
+	end,
+	
+	upButtonUp = function()		
+		if (upTimer) then
+			upTimer:remove()
+		end
 	end,
 	
 	rightButtonDown = function()
-		board:moveCursor(point.new(0,1), currentPlayer)
+		local function timerCallback()
+			board:moveCursor(point.new(0,1), currentPlayer)
+		end
+		rightTimer = playdate.timer.keyRepeatTimer(timerCallback)
+	end,
+	
+	rightButtonUp = function()	
+		if (rightTimer) then
+			rightTimer:remove()
+		end
 	end,
 	
 	leftButtonDown = function()
-		board:moveCursor(point.new(0,-1), currentPlayer)
+		local function timerCallback()
+			board:moveCursor(point.new(0,-1), currentPlayer)
+		end
+		leftTimer = playdate.timer.keyRepeatTimer(timerCallback)
+	end,
+	
+	leftButtonUp = function()	
+		if (leftTimer) then
+			leftTimer:remove()
+		end
 	end,
 	
 	AButtonDown = function()

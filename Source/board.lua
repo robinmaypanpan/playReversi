@@ -147,7 +147,7 @@ function Board:canFlipInDirection(location, direction, centerColor)
 	-- start looping
 	repeat
 		nextLocation = nextLocation + direction
-		piece = board:getPieceAt(nextLocation)
+		piece = self:getPieceAt(nextLocation)
 		if (piece and piece.pieceColor == opponentColor) then
 			foundAnOpponentPiece = true
 		end
@@ -183,7 +183,7 @@ function Board:flipInDirection(location, direction)
 	-- start looping
 	repeat
 		nextLocation = nextLocation + direction
-		piece = board:getPieceAt(nextLocation)
+		piece = self:getPieceAt(nextLocation)
 		pieceColor = piece.pieceColor
 		if (piece and piece.pieceColor == opponentColor) then
 			piece:flip()
@@ -262,7 +262,7 @@ end
 -- Moves the cursor to a position indicated by the inputs
 function Board:moveCursor(delta, currentPlayer)
 	local newPosition = self.cursorPosition + delta
-	if (board:isOnBoard(newPosition)) then
+	if (self:isOnBoard(newPosition)) then
 		self:setCursor(newPosition, currentPlayer)	
 	end
 end

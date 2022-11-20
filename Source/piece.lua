@@ -1,34 +1,41 @@
 import "CoreLibs/object"
 import 'CoreLibs/sprites'
+import 'lib/AnimatedSprite'
 
 import 'helpers'
 
 local gfx = playdate.graphics
 
-class('Piece').extends(gfx.sprite)
-
-local whiteImage = gfx.image.new('images/piece1.png')
-local blackImage = gfx.image.new('images/piece2.png')
-
-function getImageForColor(color)
-	if (color == 0) then
-		return blackImage
-	else
-		return whiteImage
-	end
-end
+class('Piece').extends(AnimatedSprite)
 
 function Piece:init(spaceSize, initialColor)
-	Piece.super.init(self)
+	local pieceImageTable = gfx.imagetable.new('images/piece')
+	Piece.super.init(self, pieceImageTable)
+	
 	assert(spaceSize > 0)
 	assert(initialColor == 1 or initialColor == 0)
+	
 	self.pieceColor = initialColor
 	self.diameter = spaceSize - 5
 	
-	self:setImage(getImageForColor(initialColor))
+	self:addState('black', 1, 7, {tickStep = 2, loop=false})
+	self:addState('white', 1, 6, {tickStep = 2, loop=false, reverse=true})
+	
+	if(initialColor == 0) then
+		self:changeState('black', false)
+		self:setImage(pieceImageTable[7])
+	else
+		self:changeState('white', false)
+		self:setImage(pieceImageTable[1])
+	end
 end
 
 function Piece:flip()
 	self.pieceColor = invertColor(self.pieceColor)
-	self:setImage(getImageForColor(self.pieceColor))
+	if(self.pieceColor == 0) then
+		self:changeState('black', true)
+	else
+		self:changeState('white', true)
+	end
+	
 end

@@ -7,7 +7,7 @@ local gfx = playdate.graphics
 class('Cursor').extends(AnimatedSprite)
 
 function Cursor:init(spaceSize)	
-	Cursor.super.init(self, gfx.imagetable.new('images/cursor'))
+	Cursor.super.init(self, gfx.imagetable.new('assets/images/cursor'))
 	self.spaceSize = spaceSize;
 	
 	self:addState('valid', 1, 3, {tickStep = 5, yoyo = true})

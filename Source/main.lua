@@ -54,7 +54,7 @@ function restartGame()
 	initializeGameState()
 end
 	
-local pieceTable = gfx.imagetable.new('images/piece')
+local pieceTable = gfx.imagetable.new('assets/images/piece')
 local whitePieceImage = pieceTable[1]
 local blackPieceImage = pieceTable[7]
 

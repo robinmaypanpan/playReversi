@@ -9,7 +9,7 @@ local gfx = playdate.graphics
 class('Piece').extends(AnimatedSprite)
 
 function Piece:init(spaceSize, initialColor)
-	local pieceImageTable = gfx.imagetable.new('images/piece')
+	local pieceImageTable = gfx.imagetable.new('assets/images/piece')
 	Piece.super.init(self, pieceImageTable)
 	
 	assert(spaceSize > 0)

@@ -1,14 +1,17 @@
 import 'CoreLibs/object'
 import 'CoreLibs/sprites'
+import 'lib/AnimatedSprite'
 
 local gfx = playdate.graphics
 
-class('Cursor').extends(gfx.sprite)
+class('Cursor').extends(AnimatedSprite)
 
 function Cursor:init(spaceSize)	
-	Cursor.super.init(self)
+	Cursor.super.init(self, gfx.imagetable.new('images/cursor'))
 	self.spaceSize = spaceSize;
-	self:setImage(self:drawCursor())
+	
+	self:addState('valid', 1, 3, {tickStep = 5, yoyo = true})
+	self:addState('invalid', 4, 5, {tickStep = 13})
 	self:setZIndex(20)
 end
 
@@ -33,5 +36,9 @@ end
 
 function Cursor:setValidPosition(isValid)
 	self.isValid = isValid
-	self:setImage(self:drawCursor())
+	if (isValid) then
+		self:changeState('valid', true)
+	else
+		self:changeState('invalid', true)
+	end
 end

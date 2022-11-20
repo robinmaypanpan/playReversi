@@ -10,10 +10,12 @@ local height = 200
 local font = gfx.font.new('assets/fonts/Bubble-Time')
 local numberFont = gfx.font.new('assets/fonts/Bubble-Time')
 
-function PlayerDisplay:init(name)
+function PlayerDisplay:init(name, pieceImage)
 	PlayerDisplay.super.init(self)
 	self.score = 0
 	self.name = name
+	self.isActive = false
+	self.pieceImage = pieceImage
 	self:setImage(self:drawDisplay())
 	self:setCenter(0,0)
 end
@@ -37,7 +39,17 @@ function PlayerDisplay:drawDisplay()
 		
 		gfx.drawTextAligned(self.score, width / 2,55,kTextAlignment.center)
 		
+		-- Last, the player indicator
+		if (self.isActive) then
+			self.pieceImage:draw(width / 2 - 12.5, 150)
+		end
+		
 	gfx.popContext()
 	return image
+end
+
+function PlayerDisplay:setActive(isActive)
+	self.isActive = isActive
+	self:setImage(self:drawDisplay())
 end
 

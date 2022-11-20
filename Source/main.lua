@@ -45,6 +45,8 @@ function initializeGameState()
 	
 	whiteDisplay:setScore(2)
 	blackDisplay:setScore(2)
+	whiteDisplay:setActive(true)
+	blackDisplay:setActive(false)
 end
 
 function restartGame()
@@ -52,13 +54,16 @@ function restartGame()
 	initializeGameState()
 end
 	
+local pieceTable = gfx.imagetable.new('images/piece')
+local whitePieceImage = pieceTable[1]
+local blackPieceImage = pieceTable[7]
 
 function setupGame()
-	whiteDisplay = PlayerDisplay('LIGHT')
+	whiteDisplay = PlayerDisplay('LIGHT', whitePieceImage)
 	whiteDisplay:add()
 	whiteDisplay:moveTo(10,15)
 	
-	blackDisplay = PlayerDisplay('DARK')
+	blackDisplay = PlayerDisplay('DARK', blackPieceImage)
 	blackDisplay:add()
 	blackDisplay:moveTo(320,15)
 	setupBoard()
@@ -75,16 +80,20 @@ function switchTurns()
 		if (passedTurn) then
 			-- TODO: show an end game screen of some sort
 			restartGame()
+			return
 		else
 			-- Pass the player's turn to the next player
 			passedTurn = true
 			switchTurns()
+			return
 		end
 	end
 	
 	local numWhitePieces, numBlackPieces = board:getScores()
 	whiteDisplay:setScore(numWhitePieces)
 	blackDisplay:setScore(numBlackPieces)
+	whiteDisplay:setActive(currentPlayer == 1)
+	blackDisplay:setActive(currentPlayer == 0)
 end
 
 -- Get the party started

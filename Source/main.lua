@@ -3,7 +3,7 @@ import "CoreLibs/graphics"
 import "CoreLibs/sprites"
 import "CoreLibs/timer"
 
-import "pulp-audio"
+import "lib/pulp-audio"
 
 import 'board'
 import 'player-display'
@@ -97,7 +97,7 @@ function switchTurns()
 end
 
 -- Get the party started
-pulp.audio.init()
+pulp.audio.init('assets/audio/pulp-songs.json', 'assets/audio/pulp-sounds.json')
 setupGame()
 board:setCursor(vector2D.new(2,2), currentPlayer)
 

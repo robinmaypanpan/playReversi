@@ -1,7 +1,7 @@
 import 'CoreLibs/object'
 import 'CoreLibs/sprites'
 import 'CoreLibs/graphics'
-import 'pulp-audio'
+import 'lib/pulp-audio'
 
 import 'piece'
 import 'cursor'

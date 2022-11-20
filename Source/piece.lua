@@ -7,6 +7,17 @@ local gfx = playdate.graphics
 
 class('Piece').extends(gfx.sprite)
 
+local whiteImage = gfx.image.new('images/piece1.png')
+local blackImage = gfx.image.new('images/piece2.png')
+
+function getImageForColor(color)
+	if (color == 0) then
+		return blackImage
+	else
+		return whiteImage
+	end
+end
+
 function Piece:init(spaceSize, initialColor)
 	Piece.super.init(self)
 	assert(spaceSize > 0)
@@ -14,27 +25,10 @@ function Piece:init(spaceSize, initialColor)
 	self.pieceColor = initialColor
 	self.diameter = spaceSize - 5
 	
-	self:setImage(self:drawPiece())
-end
-
-function Piece:drawPiece()
-	local pieceImage = gfx.image.new(self.diameter, self.diameter)
-	gfx.pushContext(pieceImage)
-		gfx.setDitherPattern(0)
-		if (self.pieceColor == 0) then
-			gfx.setColor(gfx.kColorBlack)
-			gfx.fillCircleInRect(0, 0, self.diameter, self.diameter)
-		else
-			gfx.setColor(gfx.kColorWhite)
-			gfx.fillCircleAtPoint(0, 0, self.diameter, self.diameter)
-			gfx.setColor(gfx.kColorBlack)
-			gfx.drawCircleInRect(0, 0, self.diameter, self.diameter)
-		end
-	gfx.popContext()
-	return pieceImage
+	self:setImage(getImageForColor(initialColor))
 end
 
 function Piece:flip()
 	self.pieceColor = invertColor(self.pieceColor)
-	self:setImage(self:drawPiece())
+	self:setImage(getImageForColor(self.pieceColor))
 end

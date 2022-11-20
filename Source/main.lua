@@ -5,7 +5,8 @@ import "CoreLibs/timer"
 
 import "pulp-audio"
 
-import "board"
+import 'board'
+import 'player-display'
 
 local gfx = playdate.graphics
 local vector2D = playdate.geometry.vector2D
@@ -18,6 +19,8 @@ local downTimer
 local leftTimer
 local rightTimer
 local passedTurn = false
+local whiteDisplay
+local blackDisplay
 
 function setupBoard()
 	local numSpaces = 8
@@ -39,6 +42,9 @@ function initializeGameState()
 	board:addPiece(vector2D.new(5, 5), 1)
 	
 	currentPlayer = 1
+	
+	whiteDisplay:setScore(2)
+	blackDisplay:setScore(2)
 end
 
 function restartGame()
@@ -48,6 +54,13 @@ end
 	
 
 function setupGame()
+	whiteDisplay = PlayerDisplay('LIGHT')
+	whiteDisplay:add()
+	whiteDisplay:moveTo(10,15)
+	
+	blackDisplay = PlayerDisplay('DARK')
+	blackDisplay:add()
+	blackDisplay:moveTo(320,15)
 	setupBoard()
 	initializeGameState()
 	board:addCursor()
@@ -68,6 +81,10 @@ function switchTurns()
 			switchTurns()
 		end
 	end
+	
+	local numWhitePieces, numBlackPieces = board:getScores()
+	whiteDisplay:setScore(numWhitePieces)
+	blackDisplay:setScore(numBlackPieces)
 end
 
 -- Get the party started

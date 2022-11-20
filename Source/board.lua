@@ -149,6 +149,25 @@ function Board:getValidMoves(playerColor)
 	return validMoves, numValidMoves
 end
 
+-- Returns the number of black and white pieces on the board
+function Board:getScores()
+	local whiteCount = 0
+	local blackCount = 0
+	for i=1,self.numSpaces do
+		for j=1,self.numSpaces do
+			local piece = self:getPieceAt(vector2D.new(i,j))
+			if (piece ~= nil) then
+				if (piece.pieceColor == 0) then
+					blackCount += 1
+				else
+					whiteCount += 1
+				end
+			end
+		end
+	end
+	return whiteCount, blackCount	
+end
+
 -- Returns true if we can flip all the pieces in the direction from the location in that direction
 function Board:canFlipInDirection(location, direction, centerColor)
 	assert(location ~= nil)

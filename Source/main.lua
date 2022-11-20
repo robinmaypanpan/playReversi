@@ -3,6 +3,8 @@ import "CoreLibs/graphics"
 import "CoreLibs/sprites"
 import "CoreLibs/timer"
 
+import "pulp-audio"
+
 import "board"
 
 local gfx = playdate.graphics
@@ -46,14 +48,10 @@ function setupGame()
 end
 
 -- Get the party started
+pulp.audio.init()
 setupGame()
 board:setCursor(point.new(2,2), currentPlayer)
 
--- Standard main game loop
-function playdate.update()
-	gfx.sprite.update()
-	playdate.timer.updateTimers()
-end
 
 local rootInputHandlers = {
 	downButtonDown = function()	
@@ -112,13 +110,23 @@ local rootInputHandlers = {
 		if (board:canPlacePieceAtCursor(currentPlayer)) then
 			board:placePieceAtCursor(currentPlayer)			
 			currentPlayer = invertColor(currentPlayer)
+		else
+			pulp.audio.playSound('invalid')
 		end
 	end
 }
 
 playdate.inputHandlers.push(rootInputHandlers)
 
+-- Update the system menu with our options
 local menuItem,error = playdate:getSystemMenu():addMenuItem("Restart Game", function()
 	board:clearBoard()
 	initializeGameState()
 end)
+
+-- Standard main game loop
+function playdate.update()
+	gfx.sprite.update()
+	playdate.timer.updateTimers()
+	pulp.audio.update() 
+end

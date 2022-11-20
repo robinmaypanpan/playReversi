@@ -1,0 +1,1 @@
+[{"id":0,"bpm":720,"name":"moveCursor","type":0,"notes":[12,4,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"ticks":8,"envelope":{"volume":0.5}},{"id":1,"name":"invalid","bpm":120,"ticks":3,"type":0,"notes":[3,3,2,0,0,0,0,0,0]},{"id":2,"name":"placePiece","bpm":480,"ticks":3,"type":0,"notes":[2,4,1,6,4,1,0,0,0],"envelope":{"decay":0.6,"release":0.15}}]

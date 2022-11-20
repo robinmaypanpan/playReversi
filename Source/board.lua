@@ -1,11 +1,13 @@
-import "CoreLibs/object"
+import 'CoreLibs/object'
 import 'CoreLibs/sprites'
-import "CoreLibs/graphics"
+import 'CoreLibs/graphics'
+import 'pulp-audio'
 
 import 'piece'
 import 'cursor'
 import 'helpers'
 
+local audio = pulp.audio
 local gfx = playdate.graphics
 local point = playdate.geometry.vector2D
 
@@ -263,7 +265,10 @@ end
 function Board:moveCursor(delta, currentPlayer)
 	local newPosition = self.cursorPosition + delta
 	if (self:isOnBoard(newPosition)) then
-		self:setCursor(newPosition, currentPlayer)	
+		self:setCursor(newPosition, currentPlayer)
+		audio.playSound('moveCursor')
+	else
+		audio.playSound('invalid')
 	end
 end
 
@@ -306,6 +311,7 @@ end
 function Board:placePieceAtCursor(pieceColor)
 	self:addPiece(self.cursorPosition, pieceColor)
 	self:flipPiecesAround(self.cursorPosition)
+	audio.playSound('placePiece')
 end
 
 -- Returns true if you can make a move at the cursor

@@ -1,4 +1,4 @@
-import "CoreLibs/object"
+import 'CoreLibs/object'
 import 'CoreLibs/sprites'
 
 local gfx = playdate.graphics

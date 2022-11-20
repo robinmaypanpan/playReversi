@@ -8,7 +8,7 @@ import "pulp-audio"
 import "board"
 
 local gfx = playdate.graphics
-local point = playdate.geometry.vector2D
+local vector2D = playdate.geometry.vector2D
 
 -- Game state
 local board
@@ -17,6 +17,7 @@ local upTimer
 local downTimer
 local leftTimer
 local rightTimer
+local passedTurn = false
 
 function setupBoard()
 	local numSpaces = 8
@@ -32,12 +33,17 @@ function setupBoard()
 end
 
 function initializeGameState()
-	board:addPiece(point.new(4, 5), 0)
-	board:addPiece(point.new(5, 4), 0)
-	board:addPiece(point.new(4, 4), 1)
-	board:addPiece(point.new(5, 5), 1)
+	board:addPiece(vector2D.new(4, 5), 0)
+	board:addPiece(vector2D.new(5, 4), 0)
+	board:addPiece(vector2D.new(4, 4), 1)
+	board:addPiece(vector2D.new(5, 5), 1)
 	
 	currentPlayer = 1
+end
+
+function restartGame()
+	board:clearBoard()
+	initializeGameState()
 end
 	
 
@@ -47,16 +53,33 @@ function setupGame()
 	board:addCursor()
 end
 
+function switchTurns()
+	currentPlayer = invertColor(currentPlayer)
+	
+	local validMoves, numValidMoves = board:getValidMoves(currentPlayer)
+	
+	if (numValidMoves == 0) then
+		if (passedTurn) then
+			-- TODO: show an end game screen of some sort
+			restartGame()
+		else
+			-- Pass the player's turn to the next player
+			passedTurn = true
+			switchTurns()
+		end
+	end
+end
+
 -- Get the party started
 pulp.audio.init()
 setupGame()
-board:setCursor(point.new(2,2), currentPlayer)
+board:setCursor(vector2D.new(2,2), currentPlayer)
 
 
 local rootInputHandlers = {
 	downButtonDown = function()	
 		local function timerCallback()
-			board:moveCursor(point.new(1,0), currentPlayer)
+			board:moveCursor(vector2D.new(1,0), currentPlayer)
 		end
 		downTimer = playdate.timer.keyRepeatTimer(timerCallback)
 	end,
@@ -69,7 +92,7 @@ local rootInputHandlers = {
 	
 	upButtonDown = function()
 		local function timerCallback()
-			board:moveCursor(point.new(-1,0), currentPlayer)
+			board:moveCursor(vector2D.new(-1,0), currentPlayer)
 		end
 		upTimer = playdate.timer.keyRepeatTimer(timerCallback)
 	end,
@@ -82,7 +105,7 @@ local rootInputHandlers = {
 	
 	rightButtonDown = function()
 		local function timerCallback()
-			board:moveCursor(point.new(0,1), currentPlayer)
+			board:moveCursor(vector2D.new(0,1), currentPlayer)
 		end
 		rightTimer = playdate.timer.keyRepeatTimer(timerCallback)
 	end,
@@ -95,7 +118,7 @@ local rootInputHandlers = {
 	
 	leftButtonDown = function()
 		local function timerCallback()
-			board:moveCursor(point.new(0,-1), currentPlayer)
+			board:moveCursor(vector2D.new(0,-1), currentPlayer)
 		end
 		leftTimer = playdate.timer.keyRepeatTimer(timerCallback)
 	end,
@@ -108,8 +131,8 @@ local rootInputHandlers = {
 	
 	AButtonDown = function()
 		if (board:canPlacePieceAtCursor(currentPlayer)) then
-			board:placePieceAtCursor(currentPlayer)			
-			currentPlayer = invertColor(currentPlayer)
+			board:placePieceAtCursor(currentPlayer)		
+			switchTurns()
 		else
 			pulp.audio.playSound('invalid')
 		end
@@ -119,10 +142,7 @@ local rootInputHandlers = {
 playdate.inputHandlers.push(rootInputHandlers)
 
 -- Update the system menu with our options
-local menuItem,error = playdate:getSystemMenu():addMenuItem("Restart Game", function()
-	board:clearBoard()
-	initializeGameState()
-end)
+local menuItem,error = playdate:getSystemMenu():addMenuItem("Restart Game", restartGame)
 
 -- Standard main game loop
 function playdate.update()

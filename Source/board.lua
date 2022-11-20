@@ -9,27 +9,27 @@ import 'helpers'
 
 local audio = pulp.audio
 local gfx = playdate.graphics
-local point = playdate.geometry.vector2D
+local vector2D = playdate.geometry.vector2D
 
 class('Board').extends(gfx.sprite)
 
 -- A helpful list of all possible directions
 local directions = {
-	point.new(-1,-1),
-	point.new(-1,0),
-	point.new(-1,1),
-	point.new(0,-1),
-	point.new(0,1),
-	point.new(1,-1),
-	point.new(1,0),
-	point.new(1,1)
+	vector2D.new(-1,-1),
+	vector2D.new(-1,0),
+	vector2D.new(-1,1),
+	vector2D.new(0,-1),
+	vector2D.new(0,1),
+	vector2D.new(1,-1),
+	vector2D.new(1,0),
+	vector2D.new(1,1)
 }
 
 function Board:init(numSpaces, spaceSize)
 	Board.super.init(self)
 	self.numSpaces = numSpaces
 	self.spaceSize = spaceSize
-	self.cursorPosition = point.new(0,0)
+	self.cursorPosition = vector2D.new(0,0)
 	self.padding = 5
 	
 	self:createBoardData()
@@ -117,7 +117,7 @@ function Board:calculateSpaceCenter(rcLocation)
 	local y = firstRowCenter + (row - 1) * self.spaceSize + 1
 	local x = firstColCenter + (col - 1) * self.spaceSize + 1
 	
-	return point.new(x,y)
+	return vector2D.new(x,y)
 end
 
 -- adds a piece at the indicated location
@@ -131,6 +131,22 @@ function Board:addPiece(location, pieceColor)
 	
 	piece:moveTo(x, y)
 	piece:add()
+end
+
+-- Returns an array of all valid places to move
+function Board:getValidMoves(playerColor)
+	local validMoves = {}
+	local numValidMoves = 0
+	for i=1,self.numSpaces do
+		for j=1,self.numSpaces do
+			local testPoint = vector2D.new(i,j)
+			if (self:canPlacePieceAt(testPoint, playerColor)) then
+				table.insert(validMoves, testPoint)
+				numValidMoves+=1
+			end
+		end
+	end
+	return validMoves, numValidMoves
 end
 
 -- Returns true if we can flip all the pieces in the direction from the location in that direction
@@ -248,7 +264,7 @@ function Board:addCursor()
 	end
 	self.cursor = Cursor(self.spaceSize)
 	self.cursor:add()
-	self.cursorPosition = point.new(0,0)
+	self.cursorPosition = vector2D.new(0,0)
 end
 
 -- Sets the position of the cursor

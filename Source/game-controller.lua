@@ -77,9 +77,12 @@ function GameController:makeMove(location)
 	
 	if (gameState.state == GAME_OVER) then
 		print('Game over! Restart to play again!')
+	else
+		self:notifyPlayerTurn()
 	end
 end
 
+-- Controls the position of the onscreen cursor
 function GameController:moveCursor(delta)
 	local gameState = self.gameState
 	local board = self.board
@@ -98,4 +101,18 @@ function GameController:moveCursor(delta)
 	else
 		audio.playSound('invalid')
 	end
+end
+
+-- When called, notifies the current player that it is their turn
+function GameController:notifyPlayerTurn()
+	if (self.gameState.currentPlayer == WHITE) then
+		self.whitePlayer:takeTurn()
+	else
+		self.blackPlayer:takeTurn()
+	end
+end
+
+-- When called, starts the game by telling the current player to take their turn
+function GameController:startGame()
+	self:notifyPlayerTurn()
 end

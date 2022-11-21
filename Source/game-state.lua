@@ -3,6 +3,8 @@
 import 'CoreLibs/object'
 
 import 'location'
+import 'lib/queue'
+
 
 class('GameState').extends()
 
@@ -90,10 +92,13 @@ function GameState:init(copyState)
 		self.numBlackPieces = copyState.numBlackPieces
 		
 		assert(copyState.validMoves ~= nil)
-		self.validMoves = {}
+		self.validMoves = List.new()
+		self.childStates = {}
 		self.numValidMoves = 0
-		for _,move in pairs(copyState.validMoves) do
-			table.insert(self.validMoves, move)
+		for i = copyState.validMoves.first, copyState.validMoves.last do
+			local move = copyState.validMoves[i]
+			List.pushright(self.validMoves, move)
+			self.childStates[move] = copyState.childStates[move]
 			self.numValidMoves += 1
 		end
 		
@@ -139,13 +144,15 @@ end
 
 -- Updates the array of all valid places to move
 function GameState:updateValidMoves()
-	self.validMoves = {}
+	self.validMoves = List.new()
+	self.childStates = {}
 	self.numValidMoves = 0
 	for i=1,NUM_BOARD_SPACES do
 		for j=1,NUM_BOARD_SPACES do
 			local testPoint = Location(i,j)
 			if (self:calculateIfValidMove(testPoint)) then
-				table.insert(self.validMoves, testPoint)
+				List.pushright(self.validMoves, testPoint)
+				self.childStates[testPoint] = false
 				self.numValidMoves+=1
 			end
 		end
@@ -232,7 +239,8 @@ end
 function GameState:isValidMove(location)
 	assert(location~=nil)
 	
-	for _,validMove in pairs(self.validMoves) do
+	for i = self.validMoves.first, self.validMoves.last do
+		local validMove = self.validMoves[i]
 		if (validMove.x == location.x and validMove.y == location.y) then
 			return true
 		end
@@ -275,15 +283,16 @@ function GameState:makeMove(location, createNewState)
 	gameState:addCurrentPlayerPieceAt(location)	
 	
 	-- Check for all flips in all directions
-	local validDirections = {}
+	local validDirections = List.new()
 	for _,direction in pairs(MOVE_DIRECTIONS) do
 		if (gameState:checkDirectionForMove(location, direction)) then
-			table.insert(validDirections, direction)
+			List.pushright(validDirections, direction)
 		end
 	end
 	
 	-- Execute all flips and update count as you go	
-	for _,direction in pairs(validDirections) do
+	for i = validDirections.first, validDirections.last do
+		local direction = validDirections[i]
 		gameState:flipInDirection(location, direction)
 	end
 	
@@ -313,4 +322,13 @@ end
 -- Returns a copy of this game state
 function GameState:copy()
 	return GameState(self)
+end
+
+-- A helper function to build out the possible move tree
+function GameState:generateChildren()
+	-- for _,move in pairs(self.validMoves) do
+	-- 	local newState = self:makeMove(move, true)
+	-- 	self.childStates[move] = newState
+	-- 	coroutine.yield()
+	-- end
 end

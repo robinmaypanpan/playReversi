@@ -41,7 +41,8 @@ function MinimaxAi:minimax(gameState, depth)
 	local worstMove = {value=MAX_VALUE, move=nil}
 	
 	-- Evaluate all of our possible moves
-	for _,testMove in pairs(gameState.validMoves) do		
+	for i = gameState.validMoves.first, gameState.validMoves.last do
+		local testMove = gameState.validMoves[i]	
 		local stateAfterMove = gameState:makeMove(testMove, true)
 		-- Give the animations a chance to run
 		if (playdate.getElapsedTime() * 1000 > THINK_TIME) then

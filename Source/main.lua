@@ -8,7 +8,7 @@ import "lib/pulp-audio"
 import 'board'
 import 'player-display'
 import 'players/human-player'
-import 'players/random-ai-player'
+import 'players/random-ai'
 import 'game-controller'
 
 -- Save typing!
@@ -59,7 +59,7 @@ setupGame()
 
 local gameController = GameController(board, whiteDisplay, blackDisplay)
 gameController.whitePlayer = HumanPlayer(gameController)
-gameController.blackPlayer = AiRandy(gameController)
+gameController.blackPlayer = RandomAi(gameController)
 
 gameController:startGame()
 

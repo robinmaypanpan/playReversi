@@ -6,19 +6,17 @@ import 'game-state'
 
 local vector2D = playdate.geometry.vector2D
 
-class('AiRandy').extends()
+class('BaseAi').extends()
 
-function AiRandy:init(gameController)
-	HumanPlayer.super.init(self)
+function BaseAi:init(gameController)
+	BaseAi.super.init(self)
 	self.gameController = gameController
 end
 
-function AiRandy:takeTurn()
+function BaseAi:takeTurn()
 	local gameController = self.gameController
-	local gameState = gameController.gameState
 	
-	local chosenMoveIndex = math.random(1, gameState.numValidMoves)
-	local chosenMove = gameState.validMoves[chosenMoveIndex]	
+	local chosenMove = self:chooseMove()
 	
 	playdate.timer.performAfterDelay(500, function() 
 		gameController:moveCursorTo(chosenMove) 
@@ -26,4 +24,10 @@ function AiRandy:takeTurn()
 			gameController:makeMove(chosenMove)
 		end)
 	end)
+end
+
+-- Returns the move this AI wants to play
+function BaseAi:chooseMove()	
+	-- Should never be called in the base
+	assert(false)
 end

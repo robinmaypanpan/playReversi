@@ -6,12 +6,13 @@ local vector2D = playdate.geometry.vector2D
 
 class('RandomAi').extends(BaseAi)
 
-function RandomAi:init(gameController)
-	RandomAi.super.init(self, gameController)
+function RandomAi:init(gameController, myColor)
+	RandomAi.super.init(self, gameController, myColor)
 end
 
 -- Returns the move this AI wants to play
 function RandomAi:chooseMove()
+	assert(self.gameController ~= nil)
 	local gameController = self.gameController
 	local gameState = gameController.gameState
 		

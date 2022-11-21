@@ -1,16 +1,16 @@
 import 'CoreLibs/object'
 
 import 'game-controller'
-
 import 'game-state'
+
+import 'players/player'
 
 local vector2D = playdate.geometry.vector2D
 
-class('BaseAi').extends()
+class('BaseAi').extends(Player)
 
-function BaseAi:init(gameController)
-	BaseAi.super.init(self)
-	self.gameController = gameController
+function BaseAi:init(gameController, myColor)
+	BaseAi.super.init(self, gameController, myColor)
 end
 
 function BaseAi:takeTurn()

@@ -61,17 +61,23 @@ function invertColor(color)
 end
 
 function GameState:init(copyState)
-	GameState.super.init(self)
+	GameState.super.init(self)	
 	
 	self.board = createBoard()
 	
 	if (copyState) then
+		assert(copyState ~= nil)
 		-- Copy the other state
 		
 		-- Copy the board over
+		assert(copyState.board ~= nil)
 		for row = 1,NUM_BOARD_SPACES do
 			for col = 1,NUM_BOARD_SPACES do
-				self.board[row][col] = copyState[row][col]
+				if (copyState.board[row][col] ~= nil) then
+					self.board[row][col] = copyState.board[row][col]
+				else
+					self.board[row][col] = nil
+				end
 			end
 		end
 		
@@ -83,9 +89,10 @@ function GameState:init(copyState)
 		self.numWhitePieces = copyState.numWhitePieces
 		self.numBlackPieces = copyState.numBlackPieces
 		
+		assert(copyState.validMoves ~= nil)
 		self.validMoves = {}
 		self.numValidMoves = 0
-		for _,move in copyState.validMoves do
+		for _,move in pairs(copyState.validMoves) do
 			table.insert(self.validMoves, move)
 			self.numValidMoves += 1
 		end

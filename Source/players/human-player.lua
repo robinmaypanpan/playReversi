@@ -6,14 +6,15 @@ import "lib/pulp-audio"
 
 import 'game-state'
 
+import 'players/player'
+
 local audio = pulp.audio
 local vector2D = playdate.geometry.vector2D
 
-class('HumanPlayer').extends()
+class('HumanPlayer').extends(Player)
 
-function HumanPlayer:init(gameController)
-	HumanPlayer.super.init(self)
-	self.gameController = gameController
+function HumanPlayer:init(gameController, myColor)
+	HumanPlayer.super.init(self, gameController, myColor)
 end
 
 function HumanPlayer:moveDown()	

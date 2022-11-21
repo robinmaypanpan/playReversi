@@ -9,6 +9,7 @@ import 'board'
 import 'player-display'
 import 'players/human-player'
 import 'players/random-ai'
+import 'players/minimax-ai'
 import 'game-controller'
 
 -- Save typing!
@@ -58,8 +59,8 @@ audio.init('assets/audio/pulp-songs.json', 'assets/audio/pulp-sounds.json')
 setupGame()
 
 local gameController = GameController(board, whiteDisplay, blackDisplay)
-gameController.whitePlayer = HumanPlayer(gameController)
-gameController.blackPlayer = RandomAi(gameController)
+gameController.whitePlayer = HumanPlayer(gameController, WHITE)
+gameController.blackPlayer = MinimaxAi(gameController, BLACK)
 
 gameController:startGame()
 

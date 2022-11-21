@@ -7,26 +7,25 @@ import "lib/pulp-audio"
 
 import 'board'
 import 'player-display'
+import 'game-state'
 
+-- Save typing!
 local gfx = playdate.graphics
 local vector2D = playdate.geometry.vector2D
+local audio = pulp.audio
 
 -- Game state
-local board
-local currentPlayer
+local gameState
 local upTimer
 local downTimer
 local leftTimer
 local rightTimer
-local passedTurn = false
 local whiteDisplay
 local blackDisplay
 
+-- Sets up the game board display
 function setupBoard()
-	local numSpaces = 8
-	local spaceSize = 27
-	
-	board = Board(numSpaces, spaceSize)
+	board = Board()
 	
 	local screenWidth = playdate.display.getWidth()
 	local screenHeight = playdate.display.getHeight()
@@ -35,30 +34,13 @@ function setupBoard()
 	board:add()
 end
 
-function initializeGameState()
-	board:addPiece(vector2D.new(4, 5), 0)
-	board:addPiece(vector2D.new(5, 4), 0)
-	board:addPiece(vector2D.new(4, 4), 1)
-	board:addPiece(vector2D.new(5, 5), 1)
-	
-	currentPlayer = 1
-	
-	whiteDisplay:setScore(2)
-	blackDisplay:setScore(2)
-	whiteDisplay:setActive(true)
-	blackDisplay:setActive(false)
-end
-
-function restartGame()
-	board:clearBoard()
-	initializeGameState()
-end
-	
-local pieceTable = gfx.imagetable.new('assets/images/piece')
-local whitePieceImage = pieceTable[1]
-local blackPieceImage = pieceTable[7]
-
+-- Sets up the display of the game
 function setupGame()
+	-- Setup the player displays first	
+	local pieceTable = gfx.imagetable.new('assets/images/piece')
+	local whitePieceImage = pieceTable[1]
+	local blackPieceImage = pieceTable[7]
+	
 	whiteDisplay = PlayerDisplay('LIGHT', whitePieceImage)
 	whiteDisplay:add()
 	whiteDisplay:moveTo(10,15)
@@ -66,46 +48,88 @@ function setupGame()
 	blackDisplay = PlayerDisplay('DARK', blackPieceImage)
 	blackDisplay:add()
 	blackDisplay:moveTo(320,15)
+	
 	setupBoard()
-	initializeGameState()
 	board:addCursor()
 end
 
-function switchTurns()
-	currentPlayer = invertColor(currentPlayer)
+function initializeGameState()
+	gameState = GameState()
 	
-	local validMoves, numValidMoves = board:getValidMoves(currentPlayer)
+	-- We know a few facts about the initial game state
+	assert(gameState.state == GAME_UNDERWAY)
+	assert(gameState.numValidMoves == 4)
+	assert(gameState.validMoves ~= nil)
 	
-	if (numValidMoves == 0) then
-		if (passedTurn) then
-			-- TODO: show an end game screen of some sort
-			restartGame()
-			return
-		else
-			-- Pass the player's turn to the next player
-			passedTurn = true
-			switchTurns()
-			return
-		end
+	-- Add the initial pieces here	
+	-- TODO: Find a way to do this once in one place instead of multiple
+	board:addPiece(vector2D.new(4, 5), BLACK)
+	board:addPiece(vector2D.new(5, 4), BLACK)
+	board:addPiece(vector2D.new(4, 4), WHITE)
+	board:addPiece(vector2D.new(5, 5), WHITE)
+	
+	-- Setup the displays correctly
+	whiteDisplay:setScore(gameState.numWhitePieces)
+	blackDisplay:setScore(gameState.numWhitePieces)
+	whiteDisplay:setActive(gameState.currentPlayer == WHITE)
+	blackDisplay:setActive(gameState.currentPlayer == BLACK)
+end
+
+-- Called to restart the game
+function restartGame()
+	board:clearBoard()
+	initializeGameState()
+end
+
+function makeMove(location)
+	-- Update the UI first
+	board:addPiece(location, gameState.currentPlayer)
+	board:flipPiecesAround(location)
+	audio.playSound('placePiece')
+	
+	-- Now update the game state
+	gameState:makeMove(location)
+	
+	whiteDisplay:setScore(gameState.numWhitePieces)
+	blackDisplay:setScore(gameState.numBlackPieces)
+	whiteDisplay:setActive(gameState.currentPlayer == WHITE)
+	blackDisplay:setActive(gameState.currentPlayer == BLACK)
+	
+	if (gameState.state == GAME_OVER) then
+		print('Game over! Restart to play again!')
 	end
+end
+
+function moveCursor(delta)
+	local newPosition = board.cursorPosition + delta	
 	
-	local numWhitePieces, numBlackPieces = board:getScores()
-	whiteDisplay:setScore(numWhitePieces)
-	blackDisplay:setScore(numBlackPieces)
-	whiteDisplay:setActive(currentPlayer == 1)
-	blackDisplay:setActive(currentPlayer == 0)
+	-- Check if we can move the cursor to this new position
+	local canMoveCursor = gameState:isOnBoard(newPosition)	
+	if (canMoveCursor) then
+		board:moveCursor(delta)
+		audio.playSound('moveCursor')
+		
+		-- Now check if our new location is a valid location
+		local isValidMove = gameState:isValidMove(newPosition)
+		board.cursor:setValidPosition(isValidMove)
+	else
+		audio.playSound('invalid')
+	end
 end
 
 -- Get the party started
-pulp.audio.init('assets/audio/pulp-songs.json', 'assets/audio/pulp-sounds.json')
+audio.init('assets/audio/pulp-songs.json', 'assets/audio/pulp-sounds.json')
 setupGame()
-board:setCursor(vector2D.new(2,2), currentPlayer)
+initializeGameState()
+assert(gameState.validMoves[1] ~= nil)
+board:setCursorPosition(gameState.validMoves[1])
+board.cursor:setValidPosition(true)
 
-
+-- Setup the input handlers to handle controls
 local rootInputHandlers = {
 	downButtonDown = function()	
 		local function timerCallback()
-			board:moveCursor(vector2D.new(1,0), currentPlayer)
+			moveCursor(vector2D.new(1,0))
 		end
 		downTimer = playdate.timer.keyRepeatTimer(timerCallback)
 	end,
@@ -118,7 +142,7 @@ local rootInputHandlers = {
 	
 	upButtonDown = function()
 		local function timerCallback()
-			board:moveCursor(vector2D.new(-1,0), currentPlayer)
+			moveCursor(vector2D.new(-1,0))
 		end
 		upTimer = playdate.timer.keyRepeatTimer(timerCallback)
 	end,
@@ -131,7 +155,7 @@ local rootInputHandlers = {
 	
 	rightButtonDown = function()
 		local function timerCallback()
-			board:moveCursor(vector2D.new(0,1), currentPlayer)
+			moveCursor(vector2D.new(0,1))
 		end
 		rightTimer = playdate.timer.keyRepeatTimer(timerCallback)
 	end,
@@ -144,7 +168,7 @@ local rootInputHandlers = {
 	
 	leftButtonDown = function()
 		local function timerCallback()
-			board:moveCursor(vector2D.new(0,-1), currentPlayer)
+			moveCursor(vector2D.new(0,-1))
 		end
 		leftTimer = playdate.timer.keyRepeatTimer(timerCallback)
 	end,
@@ -156,11 +180,11 @@ local rootInputHandlers = {
 	end,
 	
 	AButtonDown = function()
-		if (board:canPlacePieceAtCursor(currentPlayer)) then
-			board:placePieceAtCursor(currentPlayer)		
-			switchTurns()
+		local cursorPosition = board.cursorPosition
+		if (gameState:isValidMove(cursorPosition)) then			
+			makeMove(cursorPosition)
 		else
-			pulp.audio.playSound('invalid')
+			audio.playSound('invalid')
 		end
 	end
 }
@@ -174,5 +198,5 @@ local menuItem,error = playdate:getSystemMenu():addMenuItem("Restart Game", rest
 function playdate.update()
 	gfx.sprite.update()
 	playdate.timer.updateTimers()
-	pulp.audio.update() 
+	audio.update() 
 end

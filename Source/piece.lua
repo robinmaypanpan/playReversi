@@ -2,8 +2,6 @@ import "CoreLibs/object"
 import 'CoreLibs/sprites'
 import 'lib/AnimatedSprite'
 
-import 'helpers'
-
 local gfx = playdate.graphics
 
 class('Piece').extends(AnimatedSprite)

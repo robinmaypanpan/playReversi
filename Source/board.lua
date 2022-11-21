@@ -1,36 +1,23 @@
 import 'CoreLibs/object'
 import 'CoreLibs/sprites'
 import 'CoreLibs/graphics'
-import 'lib/pulp-audio'
 
 import 'piece'
 import 'cursor'
-import 'helpers'
+import 'game-state'
 
-local audio = pulp.audio
 local gfx = playdate.graphics
 local vector2D = playdate.geometry.vector2D
 
 class('Board').extends(gfx.sprite)
 
--- A helpful list of all possible directions
-local directions = {
-	vector2D.new(-1,-1),
-	vector2D.new(-1,0),
-	vector2D.new(-1,1),
-	vector2D.new(0,-1),
-	vector2D.new(0,1),
-	vector2D.new(1,-1),
-	vector2D.new(1,0),
-	vector2D.new(1,1)
-}
+local SPACE_SIZE = 27
+local PADDING = 5
+local BOARD_SIZE = NUM_BOARD_SPACES * SPACE_SIZE
 
-function Board:init(numSpaces, spaceSize)
+function Board:init()
 	Board.super.init(self)
-	self.numSpaces = numSpaces
-	self.spaceSize = spaceSize
-	self.cursorPosition = vector2D.new(0,0)
-	self.padding = 5
+	self.cursorPosition = vector2D.new(1,1)
 	
 	self:createBoardData()
 	
@@ -39,8 +26,8 @@ end
 
 -- Removes everything from the board
 function Board:clearBoard()
-	for i=1,self.numSpaces do
-		for j=1,self.numSpaces do
+	for i=1,NUM_BOARD_SPACES do
+		for j=1,NUM_BOARD_SPACES do
 			if (self.data[i][j]) then
 				self.data[i][j]:remove()
 			end
@@ -53,30 +40,23 @@ end
 -- Creates the initial data to put on the board
 function Board:createBoardData()
 	self.data = {}
-	for i=1,self.numSpaces do
+	for i=1,NUM_BOARD_SPACES do
 		self.data[i] = {}
-		for j=1,self.numSpaces do
+		for j=1,NUM_BOARD_SPACES do
 			self.data[i][j] = nil
 		end
 	end
 end
 
--- Returns the full size of the board
-function Board:getBoardSize()
-	return self.numSpaces * self.spaceSize;
-end
-
 -- Draws the basic board image and returns that image
 function Board:drawBoard()
-	local boardSize = self:getBoardSize()
-	local boardImage = gfx.image.new(boardSize+10, boardSize+10)
-	local padding = self.padding;
+	local boardImage = gfx.image.new(BOARD_SIZE+10, BOARD_SIZE+10)
 	gfx.pushContext(boardImage)
 		gfx.setColor(gfx.kColorBlack)
 		
 		-- Draw the board background
 		gfx.setDitherPattern(0.99)
-		gfx.fillRect(padding, padding, boardSize, boardSize)
+		gfx.fillRect(PADDING, PADDING, BOARD_SIZE, BOARD_SIZE)
 		
 		-- Draw the board squares
 		gfx.setDitherPattern(0)
@@ -84,24 +64,23 @@ function Board:drawBoard()
 		gfx.setStrokeLocation(gfx.kStrokeCentered)
 		
 		-- Draw the vertical lines first
-		for col = 1, self.numSpaces - 1 do
+		for col = 1, NUM_BOARD_SPACES - 1 do
 			gfx.drawLine(
-				padding + col*self.spaceSize, padding, 
-				padding + col*self.spaceSize, padding + boardSize)
+				PADDING + col*SPACE_SIZE, PADDING, 
+				PADDING + col*SPACE_SIZE, PADDING + BOARD_SIZE)
 		end
 		
 		-- Now draw the horizontal lines
-		for row = 1, self.numSpaces - 1 do
+		for row = 1, NUM_BOARD_SPACES - 1 do
 			gfx.drawLine(
-				padding, padding + row*self.spaceSize, 
-				padding + boardSize, padding + row*self.spaceSize)
+				PADDING, PADDING + row*SPACE_SIZE, 
+				PADDING + BOARD_SIZE, PADDING + row*SPACE_SIZE)
 		end
 		
 		-- Draw an outline around the entire board	
-		local boardSize = self:getBoardSize()
 		gfx.setStrokeLocation(gfx.kStrokeOutside)
 		gfx.setLineWidth(3)
-		gfx.drawRect(padding, padding, boardSize, boardSize)
+		gfx.drawRect(PADDING, PADDING, BOARD_SIZE, BOARD_SIZE)
 	gfx.popContext()
 	return boardImage
 end
@@ -109,13 +88,13 @@ end
 -- Calculates the center x,y coordinates of the indicated row,col space
 function Board:calculateSpaceCenter(rcLocation)
 	local row, col = rcLocation:unpack()
-	local distanceFromCenterToEdge = ((self.numSpaces - 1 ) / 2) * self.spaceSize
+	local distanceFromCenterToEdge = ((NUM_BOARD_SPACES - 1 ) / 2) * SPACE_SIZE
 	
 	local firstRowCenter = self.y - distanceFromCenterToEdge
 	local firstColCenter = self.x - distanceFromCenterToEdge
 	
-	local y = firstRowCenter + (row - 1) * self.spaceSize + 1
-	local x = firstColCenter + (col - 1) * self.spaceSize + 1
+	local y = firstRowCenter + (row - 1) * SPACE_SIZE + 1
+	local x = firstColCenter + (col - 1) * SPACE_SIZE + 1
 	
 	return vector2D.new(x,y)
 end
@@ -123,7 +102,7 @@ end
 -- adds a piece at the indicated location
 function Board:addPiece(location, pieceColor)
 	local row,col = location:unpack()
-	local piece = Piece(self.spaceSize, pieceColor)
+	local piece = Piece(SPACE_SIZE, pieceColor)
 	
 	self.data[row][col] = piece
 	
@@ -131,41 +110,6 @@ function Board:addPiece(location, pieceColor)
 	
 	piece:moveTo(x, y)
 	piece:add()
-end
-
--- Returns an array of all valid places to move
-function Board:getValidMoves(playerColor)
-	local validMoves = {}
-	local numValidMoves = 0
-	for i=1,self.numSpaces do
-		for j=1,self.numSpaces do
-			local testPoint = vector2D.new(i,j)
-			if (self:canPlacePieceAt(testPoint, playerColor)) then
-				table.insert(validMoves, testPoint)
-				numValidMoves+=1
-			end
-		end
-	end
-	return validMoves, numValidMoves
-end
-
--- Returns the number of black and white pieces on the board
-function Board:getScores()
-	local whiteCount = 0
-	local blackCount = 0
-	for i=1,self.numSpaces do
-		for j=1,self.numSpaces do
-			local piece = self:getPieceAt(vector2D.new(i,j))
-			if (piece ~= nil) then
-				if (piece.pieceColor == 0) then
-					blackCount += 1
-				else
-					whiteCount += 1
-				end
-			end
-		end
-	end
-	return whiteCount, blackCount	
 end
 
 -- Returns true if we can flip all the pieces in the direction from the location in that direction
@@ -228,28 +172,6 @@ function Board:flipInDirection(location, direction)
 	until piece == nil or pieceColor == centerColor	
 end
 
--- Return a boolean indicating whether the row, col space can be moved to
-function Board:canPlacePieceAt(location, pieceColor)
-	assert(location ~= nil)
-	assert(pieceColor ~= nil)
-	
-	local row,col = location:unpack()
-	-- You can't move onto spaces that already have pieces
-	if (self.data[row][col] ~= nil) then 
-		return false 
-	end
-	
-	-- Look in every direction for a valid move
-	for _,direction in pairs(directions) do
-		if (self:canFlipInDirection(location, direction, pieceColor)) then
-			return true
-		end
-	end
-
-	-- If we look in every direction and find nothing, we're hosed
-	return false
-end
-
 -- Flips all of the pieces around the indicated location that can and should be flipped
 -- Usually called right after to place a piece.
 -- Should be replaced by a crank action to flip all the pieces.
@@ -264,7 +186,7 @@ function Board:flipPiecesAround(location)
 	
 	-- First find all the valid directions to look in
 	local validDirections = {}
-	for _,direction in pairs(directions) do
+	for _,direction in pairs(MOVE_DIRECTIONS) do
 		if (self:canFlipInDirection(location, direction, centerColor)) then
 			table.insert(validDirections, direction)
 		end
@@ -281,36 +203,32 @@ function Board:addCursor()
 	if (self.cursor) then
 		self.cursor.remove()
 	end
-	self.cursor = Cursor(self.spaceSize)
+	self.cursor = Cursor(SPACE_SIZE)
 	self.cursor:add()
-	self.cursorPosition = vector2D.new(0,0)
+	self.cursorPosition = vector2D.new(1,1)
 end
 
 -- Sets the position of the cursor
-function Board:setCursor(newLocation, currentPlayer)	
+function Board:setCursorPosition(newLocation)	
+	assert(newLocation ~= nil)
 	assert(self:isOnBoard(newLocation))	
 	self.cursorPosition = newLocation
 	local newScreenPosition = self:calculateSpaceCenter(newLocation)	
 	local x,y = newScreenPosition:unpack()
 	self.cursor:moveTo(x,y)
-	self.cursor:setValidPosition(self:canPlacePieceAtCursor(currentPlayer))
 end
 
 -- Moves the cursor to a position indicated by the inputs
-function Board:moveCursor(delta, currentPlayer)
+function Board:moveCursor(delta)
 	local newPosition = self.cursorPosition + delta
-	if (self:isOnBoard(newPosition)) then
-		self:setCursor(newPosition, currentPlayer)
-		audio.playSound('moveCursor')
-	else
-		audio.playSound('invalid')
-	end
+	self:setCursorPosition(newPosition)
 end
 
 -- Returns true if the provided location is actually on the board
 function Board:isOnBoard(location)
-	return location.x >= 1 and location.x <= self.numSpaces
-		and location.y >= 1 and location.y <= self.numSpaces
+	assert(location ~= nil)
+	return location.x >= 1 and location.x <= NUM_BOARD_SPACES
+		and location.y >= 1 and location.y <= NUM_BOARD_SPACES
 end
 
 -- Return the piece at a given location
@@ -321,35 +239,4 @@ function Board:getPieceAt(location)
 	else
 		return nil
 	end
-end
-
--- Returns the piece at the cursor
-function Board:getPieceAtCursor()
-	return self:getPieceAt(self.cursorPosition)
-end
-
--- Returns true if theres a piece under the cursor
-function Board:hasPieceAtCursor()
-	local piece = self:getPieceAtCursor()
-	return piece ~= nil
-end
-
--- Flips the piece at the cursor, assuming there is one
-function Board:flipPieceAtCursor()
-	local piece = self:getPieceAtCursor()
-	if piece ~= nil then
-		piece:flip()
-	end
-end
-
--- Places a piece at the current cursor position
-function Board:placePieceAtCursor(pieceColor)
-	self:addPiece(self.cursorPosition, pieceColor)
-	self:flipPiecesAround(self.cursorPosition)
-	audio.playSound('placePiece')
-end
-
--- Returns true if you can make a move at the cursor
-function Board:canPlacePieceAtCursor(pieceColor)
-	return self:canPlacePieceAt(self.cursorPosition, pieceColor)
 end

@@ -2,10 +2,9 @@
 
 import 'CoreLibs/object'
 
-class('GameState').extends()
+import 'location'
 
--- Useful way to communicate pairs of information around
-local vector2D = playdate.geometry.vector2D
+class('GameState').extends()
 
 -- Global constants anyone can use
 NUM_BOARD_SPACES = 8
@@ -19,14 +18,14 @@ GAME_OVER = 1
 
 -- A helpful list of all possible directions
 MOVE_DIRECTIONS = {
-	vector2D.new(-1,-1),
-	vector2D.new(-1,0),
-	vector2D.new(-1,1),
-	vector2D.new(0,-1),
-	vector2D.new(0,1),
-	vector2D.new(1,-1),
-	vector2D.new(1,0),
-	vector2D.new(1,1)
+	Location(-1,-1),
+	Location(-1,0),
+	Location(-1,1),
+	Location(0,-1),
+	Location(0,1),
+	Location(1,-1),
+	Location(1,0),
+	Location(1,1)
 }
 
 function getPieceString(color)
@@ -130,7 +129,7 @@ end
 -- Return the piece at a given location
 function GameState:readBoardAt(location)
 	if (self:isOnBoard(location)) then
-		local row,col = location:unpack()
+		local row,col = location.unpack()
 		return self.board[row][col]
 	else
 		return nil
@@ -143,7 +142,7 @@ function GameState:updateValidMoves()
 	self.numValidMoves = 0
 	for i=1,NUM_BOARD_SPACES do
 		for j=1,NUM_BOARD_SPACES do
-			local testPoint = vector2D.new(i,j)
+			local testPoint = Location(i,j)
 			if (self:calculateIfValidMove(testPoint)) then
 				table.insert(self.validMoves, testPoint)
 				self.numValidMoves+=1
@@ -191,9 +190,8 @@ function GameState:checkDirectionForMove(location, direction)
 	
 	-- start looping
 	repeat
-		nextLocation = nextLocation + direction
-		local row, col = nextLocation:unpack()
-		piece = self:readBoardAt(nextLocation)		
+		nextLocation = nextLocation.add(direction)
+		piece = self:readBoardAt(nextLocation)
 		if (piece ~= nil and piece == opponentColor) then			
 			foundAnOpponentPiece = true
 		end
@@ -221,7 +219,7 @@ function GameState:flipInDirection(location, direction)
 	
 	-- start looping
 	repeat
-		nextLocation = nextLocation + direction
+		nextLocation = nextLocation.add(direction)
 		piece = self:readBoardAt(nextLocation)
 		if (piece ~= nil and piece == opponentColor) then
 			self:flipPieceToCurrentPlayerAt(nextLocation)
@@ -246,7 +244,7 @@ end
 function GameState:calculateIfValidMove(location)
 	assert(location ~= nil)
 	
-	local row,col = location:unpack()
+	local row,col = location.unpack()
 	-- You can't move onto spaces that already have pieces
 	if (self.board[row][col] ~= nil) then 
 		return false 

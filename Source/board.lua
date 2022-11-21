@@ -5,9 +5,9 @@ import 'CoreLibs/graphics'
 import 'piece'
 import 'cursor'
 import 'game-state'
+import 'location'
 
 local gfx = playdate.graphics
-local vector2D = playdate.geometry.vector2D
 
 class('Board').extends(gfx.sprite)
 
@@ -17,7 +17,7 @@ local BOARD_SIZE = NUM_BOARD_SPACES * SPACE_SIZE
 
 function Board:init()
 	Board.super.init(self)
-	self.cursorPosition = vector2D.new(1,1)
+	self.cursorPosition = Location(1,1)
 	
 	self:createBoardData()
 	
@@ -96,7 +96,7 @@ function Board:calculateSpaceCenter(rcLocation)
 	local y = firstRowCenter + (row - 1) * SPACE_SIZE + 1
 	local x = firstColCenter + (col - 1) * SPACE_SIZE + 1
 	
-	return vector2D.new(x,y)
+	return Location(x,y)
 end
 
 -- adds a piece at the indicated location
@@ -127,7 +127,7 @@ function Board:canFlipInDirection(location, direction, centerColor)
 	
 	-- start looping
 	repeat
-		nextLocation = nextLocation + direction
+		nextLocation = nextLocation.add(direction)
 		piece = self:getPieceAt(nextLocation)
 		if (piece and piece.pieceColor == opponentColor) then
 			foundAnOpponentPiece = true
@@ -163,7 +163,7 @@ function Board:flipInDirection(location, direction)
 	
 	-- start looping
 	repeat
-		nextLocation = nextLocation + direction
+		nextLocation = nextLocation.add(direction)
 		piece = self:getPieceAt(nextLocation)
 		pieceColor = piece.pieceColor
 		if (piece and piece.pieceColor == opponentColor) then
@@ -205,7 +205,7 @@ function Board:addCursor()
 	end
 	self.cursor = Cursor(SPACE_SIZE)
 	self.cursor:add()
-	self.cursorPosition = vector2D.new(1,1)
+	self.cursorPosition = Location(1,1)
 end
 
 -- Sets the position of the cursor

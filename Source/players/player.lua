@@ -3,8 +3,6 @@ import 'CoreLibs/object'
 import 'game-controller'
 import 'game-state'
 
-local vector2D = playdate.geometry.vector2D
-
 class('Player').extends()
 
 function Player:init(gameController, myColor)

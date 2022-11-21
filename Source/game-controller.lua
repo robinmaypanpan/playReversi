@@ -7,7 +7,6 @@ import "lib/pulp-audio"
 import 'game-state'
 
 local audio = pulp.audio
-local vector2D = playdate.geometry.vector2D
 
 class('GameController').extends()
 
@@ -40,10 +39,10 @@ function GameController:initializeGameState()
 	
 	-- Add the initial pieces here	
 	-- TODO: Find a way to do this once in one place instead of multiple
-	board:addPiece(vector2D.new(4, 5), BLACK)
-	board:addPiece(vector2D.new(5, 4), BLACK)
-	board:addPiece(vector2D.new(4, 4), WHITE)
-	board:addPiece(vector2D.new(5, 5), WHITE)
+	board:addPiece(Location(4, 5), BLACK)
+	board:addPiece(Location(5, 4), BLACK)
+	board:addPiece(Location(4, 4), WHITE)
+	board:addPiece(Location(5, 5), WHITE)
 	
 	-- Setup the displays correctly
 	self.whiteDisplay:setScore(gameState.numWhitePieces)
@@ -83,7 +82,7 @@ function GameController:makeMove(location)
 end
 
 function GameController:moveCursorBy(delta)	
-	local newPosition = self.board.cursorPosition + delta	
+	local newPosition = self.board.cursorPosition.add(delta)
 	self:moveCursorTo(newPosition)
 end
 

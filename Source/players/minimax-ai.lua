@@ -3,9 +3,8 @@ import 'CoreLibs/object'
 import 'game-state'
 import 'players/base-ai'
 
-local vector2D = playdate.geometry.vector2D
-
 local MAX_DEPTH = 2
+local THINK_TIME = 100
 
 local MAX_VALUE = 99999999
 local MIN_VALUE = -99999999

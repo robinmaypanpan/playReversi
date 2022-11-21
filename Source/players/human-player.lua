@@ -5,11 +5,10 @@ import 'game-controller'
 import "lib/pulp-audio"
 
 import 'game-state'
-
+import 'location'
 import 'players/player'
 
 local audio = pulp.audio
-local vector2D = playdate.geometry.vector2D
 
 class('HumanPlayer').extends(Player)
 
@@ -18,19 +17,19 @@ function HumanPlayer:init(gameController, myColor)
 end
 
 function HumanPlayer:moveDown()	
-	self.gameController:moveCursorBy(vector2D.new(1,0))
+	self.gameController:moveCursorBy(Location(1,0))
 end
 
 function HumanPlayer:moveUp()	
-	self.gameController:moveCursorBy(vector2D.new(-1,0))
+	self.gameController:moveCursorBy(Location(-1,0))
 end
 
 function HumanPlayer:moveRight()
-	self.gameController:moveCursorBy(vector2D.new(0,1))
+	self.gameController:moveCursorBy(Location(0,1))
 end
 
 function HumanPlayer:moveLeft()	
-	self.gameController:moveCursorBy(vector2D.new(0,-1))
+	self.gameController:moveCursorBy(Location(0,-1))
 end
 
 function HumanPlayer:attemptPlacement()	

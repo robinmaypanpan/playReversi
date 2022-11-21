@@ -2,8 +2,6 @@ import 'CoreLibs/object'
 
 import 'players/base-ai'
 
-local vector2D = playdate.geometry.vector2D
-
 class('RandomAi').extends(BaseAi)
 
 function RandomAi:init(gameController, myColor)

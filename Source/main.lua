@@ -14,7 +14,6 @@ import 'game-controller'
 
 -- Save typing!
 local gfx = playdate.graphics
-local vector2D = playdate.geometry.vector2D
 local audio = pulp.audio
 
 -- UI elements we construct here and give control to the game controller

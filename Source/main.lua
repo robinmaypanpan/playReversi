@@ -69,6 +69,6 @@ local menuItem,error = playdate:getSystemMenu():addMenuItem("Restart Game", rest
 -- Standard main game loop
 function playdate.update()
 	gfx.sprite.update()
-	playdate.timer.updateTimers()
 	audio.update() 
+	playdate.timer.updateTimers()
 end

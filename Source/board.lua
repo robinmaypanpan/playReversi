@@ -101,12 +101,12 @@ end
 
 -- adds a piece at the indicated location
 function Board:addPiece(location, pieceColor)
-	local row,col = location:unpack()
+	local row,col = location.unpack()
 	local piece = Piece(SPACE_SIZE, pieceColor)
 	
 	self.data[row][col] = piece
 	
-	local x, y = self:calculateSpaceCenter(location):unpack()
+	local x, y = self:calculateSpaceCenter(location).unpack()
 	
 	piece:moveTo(x, y)
 	piece:add()
@@ -148,7 +148,7 @@ function Board:flipInDirection(location, direction)
 	assert(direction ~= nil)
 	
 	-- Start by grabbing our starting point information	
-	local row,col = location:unpack()
+	local row,col = location.unpack()
 	local centerPiece = self.data[row][col]	
 	assert(centerPiece ~= nil)
 	
@@ -177,7 +177,7 @@ end
 -- Should be replaced by a crank action to flip all the pieces.
 function Board:flipPiecesAround(location)	
 	assert(location ~= nil)
-	local row,col = location:unpack()
+	local row,col = location.unpack()
 	
 	-- Start by grabbing a bunch of our pieces
 	local centerPiece = self.data[row][col]	
@@ -214,7 +214,7 @@ function Board:setCursorPosition(newLocation)
 	assert(self:isOnBoard(newLocation))	
 	self.cursorPosition = newLocation
 	local newScreenPosition = self:calculateSpaceCenter(newLocation)	
-	local x,y = newScreenPosition:unpack()
+	local x,y = newScreenPosition.unpack()
 	self.cursor:moveTo(x,y)
 end
 
@@ -228,7 +228,7 @@ end
 -- Return the piece at a given location
 function Board:getPieceAt(location)
 	if (self:isOnBoard(location)) then
-		local row,col = location:unpack()
+		local row,col = location.unpack()
 		return self.data[row][col]
 	else
 		return nil

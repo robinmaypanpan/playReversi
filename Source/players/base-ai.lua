@@ -16,12 +16,19 @@ end
 function BaseAi:takeTurn()
 	local gameController = self.gameController
 	
-	local chosenMove = self:chooseMove()
+	local function onComplete(chosenMove)
+		playdate.timer.performAfterDelay(500, function() 
+			gameController:moveCursorTo(chosenMove) 
+			playdate.timer.performAfterDelay(200, function()
+				gameController:makeMove(chosenMove)
+			end)
+		end)
+	end
 	
-	playdate.timer.performAfterDelay(500, function() 
-		gameController:moveCursorTo(chosenMove) 
-		playdate.timer.performAfterDelay(200, function()
-			gameController:makeMove(chosenMove)
+	playdate.timer.performAfterDelay(250, function()
+		local chosenMove = self:chooseMove()
+		playdate.timer.performAfterDelay(10, function()
+			onComplete(chosenMove)
 		end)
 	end)
 end

@@ -108,9 +108,13 @@ end
 -- When called, notifies the current player that it is their turn
 function GameController:notifyPlayerTurn()
 	if (self.gameState.currentPlayer == WHITE) then
-		self.whitePlayer:takeTurn()
+		playdate.timer.performAfterDelay(10, function()
+			self.whitePlayer:takeTurn()
+		end)
 	else
-		self.blackPlayer:takeTurn()
+		playdate.timer.performAfterDelay(10, function()
+			self.blackPlayer:takeTurn()
+		end)
 	end
 end
 

@@ -82,6 +82,7 @@ function GameState:init(copyState)
 		
 		-- Copy the remaining state values
 		self.currentPlayer = copyState.currentPlayer
+		self.nonCurrentPlayer = invertColor(self.currentPlayer)
 		self.state = copyState.state
 		
 		-- Copy calculated data over
@@ -107,6 +108,7 @@ function GameState:init(copyState)
 		
 		-- Current player for this game state
 		self.currentPlayer = WHITE
+		self.nonCurrentPlayer = invertColor(self.currentPlayer)
 		
 		-- Number of pieces of each color
 		self.numWhitePieces = 2
@@ -129,8 +131,7 @@ end
 -- Return the piece at a given location
 function GameState:readBoardAt(location)
 	if (self:isOnBoard(location)) then
-		local row,col = location.unpack()
-		return self.board[row][col]
+		return self.board[location.x][location.y]
 	else
 		return nil
 	end
@@ -153,7 +154,7 @@ end
 
 -- Add a piece of the current player at the indicated location
 function GameState:addCurrentPlayerPieceAt(location)
-	local row, col = location:unpack()
+	local row, col = location.unpack()
 	self.board[row][col] = self.currentPlayer
 	if (self.currentPlayer == WHITE) then
 		self.numWhitePieces += 1
@@ -164,7 +165,7 @@ end
 
 -- Flip the piece at the indicated location
 function GameState:flipPieceToCurrentPlayerAt(location)
-	local row, col = location:unpack()
+	local row, col = location.unpack()
 	self.board[row][col] = self.currentPlayer
 	if (self.currentPlayer == WHITE) then
 		self.numWhitePieces += 1
@@ -177,23 +178,23 @@ end
 
 -- Returns true if we can flip all the pieces in the direction from the location in that direction
 function GameState:checkDirectionForMove(location, direction)
-	assert(location ~= nil)
-	assert(direction ~= nil)
-	
-	-- Start by grabbing our starting point information	
-	local opponentColor = invertColor(self.currentPlayer)
-	
 	-- Initialize our loop variables
 	local foundAnOpponentPiece = false
-	local nextLocation = location
+	local nextRow = location.x
+	local nextCol = location.y
 	local piece
 	
 	-- start looping
 	repeat
-		nextLocation = nextLocation.add(direction)
-		piece = self:readBoardAt(nextLocation)
-		if (piece ~= nil and piece == opponentColor) then			
-			foundAnOpponentPiece = true
+		nextRow += direction.x
+		nextCol += direction.y
+		if (nextRow >= 1 and nextRow <= NUM_BOARD_SPACES and nextCol >= 1 and nextCol <= NUM_BOARD_SPACES) then
+			piece = self.board[nextRow][nextCol]
+			if (piece == self.nonCurrentPlayer) then			
+				foundAnOpponentPiece = true
+			end
+		else
+			piece = nil
 		end
 	until piece == nil or piece == self.currentPlayer
 	
@@ -268,7 +269,7 @@ function GameState:makeMove(location, createNewState)
 		gameState = self:copy()
 	end	
 	
-	local row,col = location:unpack()
+	local row,col = location.unpack()
 	
 	-- Update the center space
 	gameState:addCurrentPlayerPieceAt(location)	
@@ -306,7 +307,6 @@ function GameState:makeMove(location, createNewState)
 			gameState.currentPlayer = -1
 		end
 	end
-	
 	return gameState
 end
 

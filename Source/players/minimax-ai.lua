@@ -4,7 +4,7 @@ import 'game-state'
 import 'players/base-ai'
 
 local MAX_DEPTH = 2
-local THINK_TIME = 100
+local THINK_TIME = 50
 
 local MAX_VALUE = 99999999
 local MIN_VALUE = -99999999
@@ -19,12 +19,13 @@ function MinimaxAi:init(gameController, myColor)
 		draw = 0,
 		totalPieceDifference = 1,
 		cornerPieceBonus = 25, -- In addition to just having the piece out there
-		edgePieceBonus = 1 -- In addition to the edge piece
+		edgePieceBonus = 2 -- In addition to the edge piece
 	}
 end
 
 -- Returns the move this AI wants to play
-function MinimaxAi:chooseMove()
+function MinimaxAi:chooseMove()		
+	playdate.resetElapsedTime()
 	return self:minimax(self.gameController.gameState, MAX_DEPTH).move
 end
 
@@ -40,15 +41,26 @@ function MinimaxAi:minimax(gameState, depth)
 	local worstMove = {value=MAX_VALUE, move=nil}
 	
 	-- Evaluate all of our possible moves
-	for _,testMove in pairs(gameState.validMoves) do
+	for _,testMove in pairs(gameState.validMoves) do		
 		local stateAfterMove = gameState:makeMove(testMove, true)
+		-- Give the animations a chance to run
+		if (playdate.getElapsedTime() * 1000 > THINK_TIME) then
+			coroutine.yield()
+			playdate.resetElapsedTime()
+		end
 		local testResult = self:minimax(stateAfterMove, depth - 1)
+		-- Give the animations a chance to run
+		if (playdate.getElapsedTime() * 1000 > THINK_TIME) then
+			coroutine.yield()
+			playdate.resetElapsedTime()
+		end
 		
 		if (testResult.value > bestMove.value) then
 			bestMove = {value=testResult.value, move=testMove}
 		elseif (testResult.value < worstMove.value) then
 			worstMove = {value=testResult.value, move=testMove}
 		end
+		
 	end
 		
 	-- Now we just return it	

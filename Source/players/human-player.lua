@@ -17,19 +17,27 @@ function HumanPlayer:init(gameController, myColor)
 end
 
 function HumanPlayer:moveDown()	
-	self.gameController:moveCursorBy(Location(1,0))
+	playdate.timer.performAfterDelay(1, function()
+		self.gameController:moveCursorBy(Location(1,0))
+	end)
 end
 
 function HumanPlayer:moveUp()	
-	self.gameController:moveCursorBy(Location(-1,0))
+	playdate.timer.performAfterDelay(1, function()
+		self.gameController:moveCursorBy(Location(-1,0))
+	end)
 end
 
-function HumanPlayer:moveRight()
-	self.gameController:moveCursorBy(Location(0,1))
+function HumanPlayer:moveRight()	
+	playdate.timer.performAfterDelay(1, function()
+		self.gameController:moveCursorBy(Location(0,1))
+	end)
 end
 
-function HumanPlayer:moveLeft()	
-	self.gameController:moveCursorBy(Location(0,-1))
+function HumanPlayer:moveLeft()		
+	playdate.timer.performAfterDelay(1, function()
+		self.gameController:moveCursorBy(Location(0,-1))
+	end)
 end
 
 function HumanPlayer:attemptPlacement()	
@@ -47,41 +55,43 @@ function HumanPlayer:takeTurn()
 	-- Setup the input handlers to handle controls
 	local playerInputHandlers = {
 		downButtonDown = function()	
+			if (self.downTimer) then self.downTimer:remove() end
 			local function timerCallback() self:moveDown() end
 			self.downTimer = playdate.timer.keyRepeatTimer(timerCallback)
 		end,
 		
 		downButtonUp = function()	
-			self.downTimer:remove()
+			if (self.downTimer) then self.downTimer:remove() end
 		end,
 		
 		upButtonDown = function()
+			if (self.upTimer) then self.upTimer:remove() end
 			local function timerCallback() self:moveUp() end
 			self.upTimer = playdate.timer.keyRepeatTimer(timerCallback)
 		end,
 		
 		upButtonUp = function()		
-			self.upTimer:remove()
+			if (self.upTimer) then self.upTimer:remove() end
 		end,
 		
 		rightButtonDown = function()
+			if (self.rightTimer) then self.rightTimer:remove() end
 			local function timerCallback() self:moveRight() end				
 			self.rightTimer = playdate.timer.keyRepeatTimer(timerCallback)
 		end,
 		
 		rightButtonUp = function()	
-			self.rightTimer:remove()
+			if (self.rightTimer) then self.rightTimer:remove() end
 		end,
 		
 		leftButtonDown = function()
+			if (self.leftTimer) then self.leftTimer:remove() end
 			local function timerCallback() self:moveLeft() end
-			leftTimer = playdate.timer.keyRepeatTimer(timerCallback)
+			self.leftTimer = playdate.timer.keyRepeatTimer(timerCallback)
 		end,
 		
 		leftButtonUp = function()	
-			if (leftTimer) then
-				leftTimer:remove()
-			end
+			if (self.leftTimer) then self.leftTimer:remove() end
 		end,
 		
 		AButtonDown = function()

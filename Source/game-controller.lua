@@ -82,17 +82,20 @@ function GameController:makeMove(location)
 	end
 end
 
+function GameController:moveCursorBy(delta)	
+	local newPosition = self.board.cursorPosition + delta	
+	self:moveCursorTo(newPosition)
+end
+
 -- Controls the position of the onscreen cursor
-function GameController:moveCursor(delta)
+function GameController:moveCursorTo(newPosition)
 	local gameState = self.gameState
 	local board = self.board
-	
-	local newPosition = board.cursorPosition + delta	
 	
 	-- Check if we can move the cursor to this new position
 	local canMoveCursor = gameState:isOnBoard(newPosition)	
 	if (canMoveCursor) then
-		board:moveCursor(delta)
+		board:setCursorPosition(newPosition)
 		audio.playSound('moveCursor')
 		
 		-- Now check if our new location is a valid location

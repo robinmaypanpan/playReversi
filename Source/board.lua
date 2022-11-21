@@ -218,12 +218,6 @@ function Board:setCursorPosition(newLocation)
 	self.cursor:moveTo(x,y)
 end
 
--- Moves the cursor to a position indicated by the inputs
-function Board:moveCursor(delta)
-	local newPosition = self.cursorPosition + delta
-	self:setCursorPosition(newPosition)
-end
-
 -- Returns true if the provided location is actually on the board
 function Board:isOnBoard(location)
 	assert(location ~= nil)

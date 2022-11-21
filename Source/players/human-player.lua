@@ -1,5 +1,3 @@
--- Represents the concept of a player in abstract
-
 import 'CoreLibs/object'
 
 import 'game-controller'
@@ -19,19 +17,19 @@ function HumanPlayer:init(gameController)
 end
 
 function HumanPlayer:moveDown()	
-	self.gameController:moveCursor(vector2D.new(1,0))
+	self.gameController:moveCursorBy(vector2D.new(1,0))
 end
 
 function HumanPlayer:moveUp()	
-	self.gameController:moveCursor(vector2D.new(-1,0))
+	self.gameController:moveCursorBy(vector2D.new(-1,0))
 end
 
 function HumanPlayer:moveRight()
-	self.gameController:moveCursor(vector2D.new(0,1))
+	self.gameController:moveCursorBy(vector2D.new(0,1))
 end
 
 function HumanPlayer:moveLeft()	
-	self.gameController:moveCursor(vector2D.new(0,-1))
+	self.gameController:moveCursorBy(vector2D.new(0,-1))
 end
 
 function HumanPlayer:attemptPlacement()	

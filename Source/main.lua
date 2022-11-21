@@ -8,6 +8,7 @@ import "lib/pulp-audio"
 import 'board'
 import 'player-display'
 import 'players/human-player'
+import 'players/random-ai-player'
 import 'game-controller'
 
 -- Save typing!
@@ -48,6 +49,8 @@ function setupGame()
 	
 	setupBoard()
 	board:addCursor()
+	
+	math.randomseed(playdate.getSecondsSinceEpoch())
 end
 
 -- Get the party started
@@ -56,7 +59,7 @@ setupGame()
 
 local gameController = GameController(board, whiteDisplay, blackDisplay)
 gameController.whitePlayer = HumanPlayer(gameController)
-gameController.blackPlayer = HumanPlayer(gameController)
+gameController.blackPlayer = AiRandy(gameController)
 
 gameController:startGame()
 

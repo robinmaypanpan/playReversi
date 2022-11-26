@@ -1,6 +1,6 @@
 name=Reversi
 author=Robin Mayorga
-description=Basic Reversi game
+description=Basic Reversi game with AI
 bundleID=com.artless-entertainment.reversi
 version=0.1.1
 buildNumber=2

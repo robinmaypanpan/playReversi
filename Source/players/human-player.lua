@@ -18,25 +18,25 @@ end
 
 function HumanPlayer:moveDown()	
 	playdate.timer.performAfterDelay(1, function()
-		self.gameController:moveCursorBy(Location(1,0))
+		self.gameController:moveCursorBy(Location.new(1,0))
 	end)
 end
 
 function HumanPlayer:moveUp()	
 	playdate.timer.performAfterDelay(1, function()
-		self.gameController:moveCursorBy(Location(-1,0))
+		self.gameController:moveCursorBy(Location.new(-1,0))
 	end)
 end
 
 function HumanPlayer:moveRight()	
 	playdate.timer.performAfterDelay(1, function()
-		self.gameController:moveCursorBy(Location(0,1))
+		self.gameController:moveCursorBy(Location.new(0,1))
 	end)
 end
 
 function HumanPlayer:moveLeft()		
 	playdate.timer.performAfterDelay(1, function()
-		self.gameController:moveCursorBy(Location(0,-1))
+		self.gameController:moveCursorBy(Location.new(0,-1))
 	end)
 end
 

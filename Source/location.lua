@@ -1,10 +1,20 @@
-function Location(x, y)
+Location = {}
+
+function Location.new(x, y)
 	return {
 		x = x,
-		y = y,
-		unpack = function() return x,y end,
-		add = function(other) 
-			return Location(x + other.x, y + other.y)
-		end
+		y = y
 	}
+end
+
+function Location.unpack(location)
+	return location.x,location.y 
+end
+
+function Location.add(location, other) 
+	return Location.new(location.x + other.x, location.y + other.y)
+end
+
+function Location.equals(location, other)
+	return location ~= nil and other ~= nil and location.x == other.x and location.y == other.y
 end

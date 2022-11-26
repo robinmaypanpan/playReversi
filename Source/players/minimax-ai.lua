@@ -4,7 +4,7 @@ import 'game-state'
 import 'players/base-ai'
 
 local MAX_DEPTH = 2
-local THINK_TIME = 50
+local THINK_TIME = 30
 
 local MAX_VALUE = 99999999
 local MIN_VALUE = -99999999
@@ -25,7 +25,6 @@ end
 
 -- Returns the move this AI wants to play
 function MinimaxAi:chooseMove()		
-	playdate.resetElapsedTime()
 	return self:minimax(self.gameController.gameState, MAX_DEPTH).move
 end
 
@@ -44,16 +43,15 @@ function MinimaxAi:minimax(gameState, depth)
 	for i = gameState.validMoves.first, gameState.validMoves.last do
 		local testMove = gameState.validMoves[i]	
 		local stateAfterMove = gameState:makeMove(testMove, true)
+		
 		-- Give the animations a chance to run
-		if (playdate.getElapsedTime() * 1000 > THINK_TIME) then
-			coroutine.yield()
-			playdate.resetElapsedTime()
+		if (playdate.getCurrentTimeMilliseconds() - frameStartTime > THINK_TIME) then
+			-- coroutine.yield()
 		end
 		local testResult = self:minimax(stateAfterMove, depth - 1)
 		-- Give the animations a chance to run
-		if (playdate.getElapsedTime() * 1000 > THINK_TIME) then
-			coroutine.yield()
-			playdate.resetElapsedTime()
+		if (playdate.getCurrentTimeMilliseconds() - frameStartTime > THINK_TIME) then
+			-- coroutine.yield()
 		end
 		
 		if (testResult.value > bestMove.value) then

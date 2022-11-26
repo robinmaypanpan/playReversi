@@ -39,10 +39,10 @@ function GameController:initializeGameState()
 	
 	-- Add the initial pieces here	
 	-- TODO: Find a way to do this once in one place instead of multiple
-	board:addPiece(Location(4, 5), BLACK)
-	board:addPiece(Location(5, 4), BLACK)
-	board:addPiece(Location(4, 4), WHITE)
-	board:addPiece(Location(5, 5), WHITE)
+	board:addPiece(Location.new(4, 5), BLACK)
+	board:addPiece(Location.new(5, 4), BLACK)
+	board:addPiece(Location.new(4, 4), WHITE)
+	board:addPiece(Location.new(5, 5), WHITE)
 	
 	-- Setup the displays correctly
 	self.whiteDisplay:setScore(gameState.numWhitePieces)
@@ -58,23 +58,25 @@ function GameController:restartGame()
 end
 
 function GameController:makeMove(location)	
-	local gameState = self.gameState
 	local board = self.board
 	
 	-- Update the UI first
-	board:addPiece(location, gameState.currentPlayer)
+	board:addPiece(location, self.gameState.currentPlayer)
 	board:flipPiecesAround(location)
 	audio.playSound('placePiece')
 	
-	-- Now update the game state
-	gameState:makeMove(location)
+	-- Get the game state that corresponds to the new move
+	local newGameState = stateGenerator:makeMove(self.gameState, location)
+	self.gameState = newGameState
 	
-	self.whiteDisplay:setScore(gameState.numWhitePieces)
-	self.blackDisplay:setScore(gameState.numBlackPieces)
-	self.whiteDisplay:setActive(gameState.currentPlayer == WHITE)
-	self.blackDisplay:setActive(gameState.currentPlayer == BLACK)
+	board:validateGameState(newGameState)
 	
-	if (gameState.state == GAME_OVER) then
+	self.whiteDisplay:setScore(newGameState.numWhitePieces)
+	self.blackDisplay:setScore(newGameState.numBlackPieces)
+	self.whiteDisplay:setActive(newGameState.currentPlayer == WHITE)
+	self.blackDisplay:setActive(newGameState.currentPlayer == BLACK)
+	
+	if (newGameState.state == GAME_OVER) then
 		print('Game over! Restart to play again!')
 	else
 		self:notifyPlayerTurn()
@@ -82,7 +84,7 @@ function GameController:makeMove(location)
 end
 
 function GameController:moveCursorBy(delta)	
-	local newPosition = self.board.cursorPosition.add(delta)
+	local newPosition = Location.add(self.board.cursorPosition, delta)
 	self:moveCursorTo(newPosition)
 end
 

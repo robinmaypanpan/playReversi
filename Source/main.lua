@@ -11,6 +11,7 @@ import 'players/human-player'
 import 'players/random-ai'
 import 'players/minimax-ai'
 import 'game-controller'
+import 'state-generator'
 
 -- Save typing!
 local gfx = playdate.graphics
@@ -59,7 +60,9 @@ setupGame()
 
 local gameController = GameController(board, whiteDisplay, blackDisplay)
 gameController.whitePlayer = HumanPlayer(gameController, WHITE)
-gameController.blackPlayer = MinimaxAi(gameController, BLACK)
+gameController.blackPlayer = HumanPlayer(gameController, BLACK)
+
+stateGenerator = StateGenerator(gameController.gameState)
 
 gameController:startGame()
 
@@ -72,5 +75,5 @@ function playdate.update()
 	gfx.sprite.update()
 	audio.update() 
 	playdate.timer.updateTimers()
-	gameController.gameState:generateChildren()
+	stateGenerator:update()
 end

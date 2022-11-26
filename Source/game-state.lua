@@ -5,7 +5,6 @@ import 'CoreLibs/object'
 import 'location'
 import 'lib/queue'
 
-
 class('GameState').extends()
 
 local THINK_TIME = 20
@@ -73,7 +72,6 @@ function GameState:init(copyState)
 		-- Copy the other state
 		
 		-- Copy the values of the board over
-		assert(copyState.board ~= nil)
 		for row = 1,NUM_BOARD_SPACES do
 			for col = 1,NUM_BOARD_SPACES do
 				if (copyState.board[row][col] ~= nil) then
@@ -94,7 +92,6 @@ function GameState:init(copyState)
 		self.numBlackPieces = copyState.numBlackPieces
 		
 		-- Copy calculated moves over by value
-		assert(copyState.validMoves ~= nil)
 		self.validMoves = List.new()
 		self.numValidMoves = 0
 		for i = copyState.validMoves.first, copyState.validMoves.last do
@@ -102,8 +99,6 @@ function GameState:init(copyState)
 			List.pushright(self.validMoves, move)
 			self.numValidMoves += 1
 		end
-		assert(self.numValidMoves == copyState.numValidMoves)
-		assert(self.validMoves.length == copyState.validMoves.length)
 		
 	else		
 		-- Create a starter game state
@@ -272,12 +267,9 @@ function GameState:calculateIfValidMove(location)
 end
 
 -- Function to execute a move
-function GameState:makeMove(location)		
-	-- if (self.childStates[location]) then
-	-- 	return self.childStates[location]
-	-- end
-	
+function GameState:makeMove(location)	
 	local row,col = Location.unpack(location)
+	print ('Making a move at ' .. row .. ',' .. col)
 	
 	-- Update the center space
 	self:addCurrentPlayerPieceAt(location)	
@@ -289,6 +281,7 @@ function GameState:makeMove(location)
 			List.pushright(validDirections, direction)
 		end
 	end
+	print ('Found ' .. validDirections.length .. ' directions to flip in from here')
 	
 	-- Execute all flips and update count as you go	
 	for i = validDirections.first, validDirections.last do
@@ -303,7 +296,8 @@ function GameState:makeMove(location)
 	self:updateValidMoves()
 	
 	-- Check to see if we have any actual valid moves
-	if (self.numValidMoves == 0) then			
+	if (self.numValidMoves == 0) then		
+		print('No valid moves, so skipping turn')	
 		-- Update current player
 		self.currentPlayer = invertColor(self.currentPlayer)
 			
@@ -321,33 +315,4 @@ end
 -- Returns a copy of this game state
 function GameState:copy()
 	return GameState(self)
-end
-
--- A helper function to build out the possible move tree
-function GameState:generateChildren()
-	local validMoves = self.validMoves
-	local childStates = self.childStates
-	
-	if (self.numGeneratedChildren < self.numValidMoves) then
-		-- Generate states for all of my moves
-		for i = validMoves.first,validMoves.last do
-			local move = validMoves[i]
-			local childState = childStates[move]
-			
-			if (childState == false) then			
-				local newState = self:makeMove(move, true)
-				childStates[move] = newState
-				self.numGeneratedChildren += 1
-			end			
-			
-			-- Allow us to back out if we've been working too long
-			local currentTime = playdate.getCurrentTimeMilliseconds()
-			if (not preventExit and currentTime - frameStartTime > THINK_TIME) then
-				break
-			end
-		end
-	else
-		-- Now we could generate states for our children, don't you think!
-		
-	end
 end

@@ -269,7 +269,6 @@ end
 -- Function to execute a move
 function GameState:makeMove(location)	
 	local row,col = Location.unpack(location)
-	print ('Making a move at ' .. row .. ',' .. col)
 	
 	-- Update the center space
 	self:addCurrentPlayerPieceAt(location)	
@@ -281,7 +280,6 @@ function GameState:makeMove(location)
 			List.pushright(validDirections, direction)
 		end
 	end
-	print ('Found ' .. validDirections.length .. ' directions to flip in from here')
 	
 	-- Execute all flips and update count as you go	
 	for i = validDirections.first, validDirections.last do
@@ -290,15 +288,16 @@ function GameState:makeMove(location)
 	end
 	
 	-- Update current player
-	self.currentPlayer = invertColor(self.currentPlayer)
+	self.nonCurrentPlayer = self.currentPlayer
+	self.currentPlayer = invertColor(self.currentPlayer)	
 	
 	-- Update valid moves
 	self:updateValidMoves()
 	
 	-- Check to see if we have any actual valid moves
 	if (self.numValidMoves == 0) then		
-		print('No valid moves, so skipping turn')	
 		-- Update current player
+		self.nonCurrentPlayer = self.currentPlayer
 		self.currentPlayer = invertColor(self.currentPlayer)
 			
 		-- Update valid moves
@@ -307,6 +306,7 @@ function GameState:makeMove(location)
 		if (self.numValidMoves == 0) then
 			-- if we have to pass twice, the game is over
 			self.state = GAME_OVER
+			self.nonCurrentPlayer = -1
 			self.currentPlayer = -1
 		end
 	end

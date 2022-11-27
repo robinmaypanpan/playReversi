@@ -57,6 +57,7 @@ function StateGenerator:setNewRoot(fromGameState, toMove)
 	
 	local startNewTime = playdate.getCurrentTimeMilliseconds()
 	print ('Setting new root with ' .. self.treeSize .. ' states')
+	local startTime = playdate.getCurrentTimeMilliseconds()
 
 	-- Clean up the move list first
 	for i = fromGameState.validMoves.first,fromGameState.validMoves.last do
@@ -72,10 +73,8 @@ function StateGenerator:setNewRoot(fromGameState, toMove)
 	
 	self.tree[fromGameState] = nil	
 	self.treeSize -= 1	
-	
-	
-	
-	print ('Finished making root with ' .. self.treeSize .. ' states')
+		
+	print ('Finished making root with ' .. self.treeSize .. ' states after ' .. playdate.getCurrentTimeMilliseconds() - startTime .. 'ms')
 end
 
 -- Virtually executes this move by resetting the root and returning the new state

@@ -5,7 +5,7 @@ import 'lib/queue'
 
 local MS_PER_FRAME <const> = 1000 // playdate.display.getRefreshRate()
 local TIME_LIMIT = 0.8 * MS_PER_FRAME
-local MAX_TREE_SIZE = 1000
+local MAX_TREE_SIZE = 1500
 
 -- Returns a hash of the move
 function hashMove(move)
@@ -74,7 +74,7 @@ function StateGenerator:setNewRoot(fromGameState, toMove)
 	self.tree[fromGameState] = nil	
 	self.treeSize -= 1	
 		
-	print ('Finished making root with ' .. self.treeSize .. ' states after ' .. playdate.getCurrentTimeMilliseconds() - startTime .. 'ms')
+	print ('Finished making new root with ' .. self.treeSize .. ' states after ' .. playdate.getCurrentTimeMilliseconds() - startTime .. 'ms')
 end
 
 -- Virtually executes this move by resetting the root and returning the new state

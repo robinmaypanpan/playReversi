@@ -90,7 +90,7 @@ function runGame()
 		
 		if (showDebugElements) then
 			playdate.drawFPS(10, 220)
-			playdate.graphics.drawTextAligned(stateGenerator.treeSize, playdate.display.getWidth() - 20, 220, kTextAlignment.right)
+			playdate.graphics.drawTextAligned(stateGenerator.depth .. '-' .. stateGenerator.treeSize, playdate.display.getWidth() - 20, 220, kTextAlignment.right)
 		end
 	end
 end

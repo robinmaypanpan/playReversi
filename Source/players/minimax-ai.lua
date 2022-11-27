@@ -40,19 +40,11 @@ function MinimaxAi:minimax(gameState, depth)
 	local worstMove = {value=MAX_VALUE, move=nil}
 	
 	-- Evaluate all of our possible moves
-	for i = gameState.validMoves.first, gameState.validMoves.last do
-		local testMove = gameState.validMoves[i]	
+	List.forEach(gameState.validMoves, function(testMove)
 		local stateAfterMove = stateGenerator:getState(gameState, testMove)
+		assert(stateAfterMove ~= nil)
 		
-		-- Give the animations a chance to run
-		if (playdate.getCurrentTimeMilliseconds() - frameStartTime > THINK_TIME) then
-			-- coroutine.yield()
-		end
 		local testResult = self:minimax(stateAfterMove, depth - 1)
-		-- Give the animations a chance to run
-		if (playdate.getCurrentTimeMilliseconds() - frameStartTime > THINK_TIME) then
-			-- coroutine.yield()
-		end
 		
 		if (testResult.value > bestMove.value) then
 			bestMove = {value=testResult.value, move=testMove}
@@ -60,7 +52,7 @@ function MinimaxAi:minimax(gameState, depth)
 			worstMove = {value=testResult.value, move=testMove}
 		end
 		
-	end
+	end)
 		
 	-- Now we just return it	
 	if (gameState.currentPlayer == self.myColor ) then		

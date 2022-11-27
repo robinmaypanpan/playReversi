@@ -71,6 +71,8 @@ function GameState:init(copyState)
 		assert(copyState ~= nil)
 		-- Copy the other state
 		
+		self.depth = copyState.depth + 1
+		
 		-- Copy the values of the board over
 		for row = 1,NUM_BOARD_SPACES do
 			for col = 1,NUM_BOARD_SPACES do
@@ -102,6 +104,7 @@ function GameState:init(copyState)
 		
 	else		
 		-- Create a starter game state
+		self.depth = 1
 		
 		-- Put the 4 pieces in the center
 		self.board[4][5] = BLACK

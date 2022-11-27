@@ -42,7 +42,7 @@ function MinimaxAi:minimax(gameState, depth)
 	-- Evaluate all of our possible moves
 	for i = gameState.validMoves.first, gameState.validMoves.last do
 		local testMove = gameState.validMoves[i]	
-		local stateAfterMove = gameState:makeMove(testMove, true)
+		local stateAfterMove = stateGenerator:getState(gameState, testMove)
 		
 		-- Give the animations a chance to run
 		if (playdate.getCurrentTimeMilliseconds() - frameStartTime > THINK_TIME) then

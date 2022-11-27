@@ -84,6 +84,11 @@ function StateGenerator:makeMove(gameState, move)
 	return newGameState
 end
 
+-- Returns the game state associated with this move
+function StateGenerator:getState(gameState, move)
+	return self.tree[gameState][hashMove(move)]
+end
+
 -- Deletes all generated states and starts over with new states
 function StateGenerator:reset(newInitialGameState)
 	assert(newInitialGameState ~= nil)	

@@ -71,7 +71,7 @@ function runGame()
 	
 	gameController = GameController(board, whiteDisplay, blackDisplay)
 	gameController.whitePlayer = HumanPlayer(gameController, WHITE)
-	gameController.blackPlayer = HumanPlayer(gameController, BLACK)
+	gameController.blackPlayer = MinimaxAi(gameController, BLACK)
 	
 	stateGenerator = StateGenerator(gameController.gameState)
 	

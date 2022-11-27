@@ -1,6 +1,7 @@
 local gfx = playdate.graphics
 
 import '../game-state.lua'
+import '../game-controller.lua'
 
 TestState = {}
 
@@ -28,7 +29,7 @@ function TestState:setUp()
 	self.gameState = GameState()
 end
 
-function TestState:testCreationAndInitialState()	
+function TestState:testGameStateIsInitializedCorrectly()	
 	local gameState = self.gameState
 	luaunit.assertNotIsNil(gameState)
 	
@@ -54,7 +55,7 @@ function TestState:testCreationAndInitialState()
 	assertContainsLocation(self.gameState.validMoves, 6, 4)	
 end
 
-function TestState:testCopyWorks()
+function TestState:testCopyingInitialState()
 	local copyState = GameState(self.gameState)
 	
 	luaunit.assertNotIsNil(copyState)
@@ -88,6 +89,7 @@ function TestState:testStateAfterMove()
 	luaunit.assertEquals(self.gameState.numBlackPieces, 1)
 	
 	luaunit.assertEquals(self.gameState.currentPlayer, BLACK)
+	luaunit.assertEquals(self.gameState.nonCurrentPlayer, WHITE)
 	
 	luaunit.assertEquals(self.gameState.validMoves.length, 3)
 	luaunit.assertEquals(self.gameState.numValidMoves, 3)
@@ -98,6 +100,28 @@ function TestState:testStateAfterMove()
 	
 	assertNotContainsLocation(self.gameState.validMoves, 4, 3)	
 	
+end
+
+function TestState:testCopyAfterMove()
+	self.gameState:makeMove(Location.new(4,6))
+	local copyState = GameState(self.gameState)
+	
+	luaunit.assertNotIsNil(copyState)
+	
+	luaunit.assertEquals(copyState.numWhitePieces, 4)
+	luaunit.assertEquals(copyState.numBlackPieces, 1)
+	
+	luaunit.assertEquals(copyState.currentPlayer, BLACK)
+	luaunit.assertEquals(copyState.nonCurrentPlayer, WHITE)
+	
+	luaunit.assertEquals(copyState.validMoves.length, 3)
+	luaunit.assertEquals(copyState.numValidMoves, 3)
+	
+	assertContainsLocation(copyState.validMoves, 3, 4)
+	assertContainsLocation(copyState.validMoves, 3, 6)
+	assertContainsLocation(copyState.validMoves, 5, 6)
+	
+	assertNotContainsLocation(copyState.validMoves, 4, 3)	
 end
 
 function TestState:tearDown()

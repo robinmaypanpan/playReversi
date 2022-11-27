@@ -4,7 +4,7 @@ import 'game-state'
 import 'lib/queue'
 
 local MS_PER_FRAME <const> = 1000 // playdate.display.getRefreshRate()
-local TIME_LIMIT = 0.8 * MS_PER_FRAME
+local TIME_LIMIT = 0.9 * MS_PER_FRAME
 local MAX_TREE_SIZE = 1500
 
 -- Returns a hash of the move
@@ -23,13 +23,7 @@ function StateGenerator:init(initialGameState)
 	self.treeTop = initialGameState
 	self.treeSize = 1
 	
-	self:addToQueue(initialGameState)
-end
-
-function StateGenerator:addToQueue(gameState)
-	for i = gameState.validMoves.first,gameState.validMoves.last do
-		List.pushright(self.queue, {fromGameState = gameState, move = gameState.validMoves[i]})
-	end
+	List.pushright(self.queue, initialGameState)
 end
 
 -- Kills this node and every child
@@ -98,7 +92,7 @@ function StateGenerator:reset(newInitialGameState)
 	self.treeTop = newInitialGameState
 	self.treeSize = 1
 	
-	self:addToQueue(newInitialGameState)
+	List.pushright(self.queue, newInitialGameState)
 end
 
 function StateGenerator:update()
@@ -106,21 +100,27 @@ function StateGenerator:update()
 		-- Only run this if we have room in the tree to add more states
 		repeat
 			if (self.queue.length > 0) then
-				local toGenerate = List.popleft(self.queue)
-				-- Verify that we actually have this node still in the tree. If not, we ignore it.
-				if (self.tree[toGenerate.fromGameState] ~= nil) then
+				local fromGameState = List.peekleft(self.queue)
+				
+				-- If the state is dead or there are no moves left to process, remove it from the queue and move on				
+				if (self.tree[fromGameState] == nil or fromGameState.validMoveQueue.length == 0) then
+					-- Remove this element from the queue
+					List.popleft(self.queue)			
+				else						
+					-- Grab a move to evaluate
+					local toMove = List.popleft(fromGameState.validMoveQueue)						
 					
 					-- Generate the new state
-					local newState = toGenerate.fromGameState:copy()
-					newState:makeMove(toGenerate.move)
+					local newState = fromGameState:copy()
+					newState:makeMove(toMove)
 					
 					-- Update the tree			
-					self.tree[toGenerate.fromGameState][hashMove(toGenerate.move)] = newState
+					self.tree[fromGameState][hashMove(toMove)] = newState
 					self.tree[newState] = {}
 					self.treeSize += 1
 					
-					-- Queue the state to be processed as well
-					self:addToQueue(newState)
+					-- Queue the new state to be processed as well
+					List.pushright(self.queue, newState)
 				end
 			end
 		until playdate.getCurrentTimeMilliseconds() - frameStartTime > TIME_LIMIT or self.treeSize > MAX_TREE_SIZE or self.queue.length == 0

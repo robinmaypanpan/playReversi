@@ -7,7 +7,7 @@ TestState = {}
 
 function assertContainsLocation(moveList, row, col)	
 	luaunit.assertIsTrue(
-		List.find(moveList,
+		List.check(moveList,
 			function(testValue) 
 				return testValue.x == row and testValue.y == col
 			end
@@ -17,7 +17,7 @@ end
 
 function assertNotContainsLocation(moveList, row, col)	
 	luaunit.assertIsFalse(
-		List.find(moveList,
+		List.check(moveList,
 			function(testValue) 
 				return testValue.x == row and testValue.y == col
 			end

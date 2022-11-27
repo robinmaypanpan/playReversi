@@ -93,6 +93,7 @@ function GameState:init(copyState)
 		
 		-- Copy calculated moves over by value
 		self.validMoves = List.new()
+		self.validMoveQueue = List.new()
 		self.numValidMoves = 0
 		for i = copyState.validMoves.first, copyState.validMoves.last do
 			local move = copyState.validMoves[i]
@@ -143,12 +144,14 @@ end
 -- Updates the array of all valid places to move
 function GameState:updateValidMoves()
 	self.validMoves = List.new()
+	self.validMoveQueue = List.new()
 	self.numValidMoves = 0
 	for i=1,NUM_BOARD_SPACES do
 		for j=1,NUM_BOARD_SPACES do
 			local testPoint = Location.new(i,j)
 			if (self:calculateIfValidMove(testPoint)) then
 				List.pushright(self.validMoves, testPoint)
+				List.pushright(self.validMoveQueue, testPoint)
 				self.numValidMoves+=1
 			end
 		end

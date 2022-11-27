@@ -25,7 +25,7 @@ local blackDisplay
 -- Game state inputHandlers
 local gameController
 
-showDebugElements = true
+local showDebugElements = true
 
 -- Sets up the game board display
 function setupBoard()
@@ -64,6 +64,11 @@ function restartGame()
 	gameController:restartGame()
 end
 
+-- Toggles the debug mode
+function toggleDebug(newValue)
+	showDebugElements = newValue
+end
+
 -- Runs the game
 function runGame()
 	audio.init('assets/audio/pulp-songs.json', 'assets/audio/pulp-sounds.json')
@@ -78,7 +83,8 @@ function runGame()
 	gameController:startGame()
 	
 	-- Update the system menu with our options
-	local menuItem,error = playdate:getSystemMenu():addMenuItem("Restart Reverse", restartGame)
+	playdate:getSystemMenu():addMenuItem('Restart Game', restartGame)
+	playdate:getSystemMenu():addCheckmarkMenuItem('Debug', showDebugElements, toggleDebug)
 	
 	-- Standard main game loop
 	function playdate.update()

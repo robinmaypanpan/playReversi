@@ -1,3 +1,4 @@
+-- Highly performant list implementation that allows access as a stack or queue.
 List = {}
 
 -- Creates a new list
@@ -6,7 +7,7 @@ function List.new ()
 end
 
 -- Adds an element to the front of the list
-function List.pushleft (list, value)
+function List.pushFront (list, value)
   local first = list.first - 1
   list.first = first
   list[first] = value
@@ -14,7 +15,7 @@ function List.pushleft (list, value)
 end
 
 -- Adds an element to the end of this list
-function List.pushright (list, value)
+function List.pushEnd (list, value)
   local last = list.last + 1
   list.last = last
   list[last] = value
@@ -22,7 +23,7 @@ function List.pushright (list, value)
 end
 
 -- Removes an element from the front of the list
-function List.popleft (list)
+function List.popFront (list)
   local first = list.first
   if first > list.last then error("list is empty") end
   local value = list[first]
@@ -33,7 +34,7 @@ function List.popleft (list)
 end
 
 -- Removes an element from the back of the list
-function List.popright (list)
+function List.popEnd (list)
   local last = list.last
   if list.first > last then error("list is empty") end
   local value = list[last]
@@ -44,7 +45,7 @@ function List.popright (list)
 end
 
 -- Returns an element from the front of the list without removing it
-function List.peekleft (list)
+function List.peekFront (list)
   local first = list.first
   if first > list.last then error("list is empty") end
   local value = list[first]
@@ -52,7 +53,7 @@ function List.peekleft (list)
 end
 
 -- Returns an element from the back of the list without removing it
-function List.peekright (list)
+function List.peekEnd (list)
   local last = list.last
   if list.first > last then error("list is empty") end
   local value = list[last]
@@ -87,4 +88,11 @@ function List.find(list, test)
     end
   end
   return nil
+end
+
+-- Executes the provided function on each element of the list
+function List.forEach(list, func)  
+  for i = list.first, list.last do
+    func(list[i])
+  end
 end

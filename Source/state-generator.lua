@@ -1,10 +1,10 @@
 import 'CoreLibs/object'
 
 import 'game-state'
-import 'lib/queue'
+import 'lib/list'
 
 local MS_PER_FRAME <const> = 1000 // playdate.display.getRefreshRate()
-local TIME_LIMIT = 0.8 * MS_PER_FRAME
+local TIME_LIMIT = 0.9 * MS_PER_FRAME
 local MAX_TREE_SIZE = 1500
 
 -- Returns a hash of the move
@@ -23,27 +23,21 @@ function StateGenerator:init(initialGameState)
 	self.treeTop = initialGameState
 	self.treeSize = 1
 	
-	self:addToQueue(initialGameState)
-end
-
-function StateGenerator:addToQueue(gameState)
-	for i = gameState.validMoves.first,gameState.validMoves.last do
-		List.pushright(self.queue, {fromGameState = gameState, move = gameState.validMoves[i]})
-	end
+	List.pushEnd(self.queue, initialGameState)
 end
 
 -- Kills this node and every child
 function StateGenerator:cull(gameStateToCull)	
 	assert(gameStateToCull ~= nil)	
-	for i = gameStateToCull.validMoves.first,gameStateToCull.validMoves.last do
-		local move = gameStateToCull.validMoves[i]
+	
+	List.forEach(gameStateToCull.validMoves, function(move) 		
 		local moveHash = hashMove(move)
 		local deadState = self.tree[gameStateToCull][moveHash]
 		if (deadState ~= nil) then
 			self:cull(deadState)
 		end
 		self.tree[gameStateToCull][moveHash] = nil
-	end
+	end)
 	
 	self.tree[gameStateToCull] = nil		
 	self.treeSize -= 1
@@ -55,9 +49,8 @@ function StateGenerator:setNewRoot(fromGameState, toMove)
 	local newTreeTop = self.tree[fromGameState][toMoveHash]		
 	self.treeTop = newTreeTop
 
-	-- Clean up the move list first
-	for i = fromGameState.validMoves.first,fromGameState.validMoves.last do
-		local deadMove = fromGameState.validMoves[i]
+	-- Clean up the move list first	
+	List.forEach(fromGameState.validMoves, function(deadMove) 		
 		local deadMoveHash = hashMove(deadMove)
 		if (deadMoveHash ~= toMoveHash) then
 			local deadState = self.tree[fromGameState][deadMoveHash]
@@ -65,7 +58,7 @@ function StateGenerator:setNewRoot(fromGameState, toMove)
 				self:cull(deadState)
 			end
 		end
-	end
+	end)
 	
 	self.tree[fromGameState] = nil	
 	self.treeSize -= 1	
@@ -84,6 +77,11 @@ function StateGenerator:makeMove(gameState, move)
 	return newGameState
 end
 
+-- Returns the game state associated with this move
+function StateGenerator:getState(gameState, move)
+	return self.tree[gameState][hashMove(move)]
+end
+
 -- Deletes all generated states and starts over with new states
 function StateGenerator:reset(newInitialGameState)
 	assert(newInitialGameState ~= nil)	
@@ -93,7 +91,7 @@ function StateGenerator:reset(newInitialGameState)
 	self.treeTop = newInitialGameState
 	self.treeSize = 1
 	
-	self:addToQueue(newInitialGameState)
+	List.pushEnd(self.queue, newInitialGameState)
 end
 
 function StateGenerator:update()
@@ -101,21 +99,27 @@ function StateGenerator:update()
 		-- Only run this if we have room in the tree to add more states
 		repeat
 			if (self.queue.length > 0) then
-				local toGenerate = List.popleft(self.queue)
-				-- Verify that we actually have this node still in the tree. If not, we ignore it.
-				if (self.tree[toGenerate.fromGameState] ~= nil) then
+				local fromGameState = List.peekFront(self.queue)
+				
+				-- If the state is dead or there are no moves left to process, remove it from the queue and move on				
+				if (self.tree[fromGameState] == nil or fromGameState.validMoveQueue.length == 0) then
+					-- Remove this element from the queue
+					List.popFront(self.queue)			
+				else						
+					-- Grab a move to evaluate
+					local toMove = List.popFront(fromGameState.validMoveQueue)						
 					
 					-- Generate the new state
-					local newState = toGenerate.fromGameState:copy()
-					newState:makeMove(toGenerate.move)
+					local newState = fromGameState:copy()
+					newState:makeMove(toMove)
 					
 					-- Update the tree			
-					self.tree[toGenerate.fromGameState][hashMove(toGenerate.move)] = newState
+					self.tree[fromGameState][hashMove(toMove)] = newState
 					self.tree[newState] = {}
 					self.treeSize += 1
 					
-					-- Queue the state to be processed as well
-					self:addToQueue(newState)
+					-- Queue the new state to be processed as well
+					List.pushEnd(self.queue, newState)
 				end
 			end
 		until playdate.getCurrentTimeMilliseconds() - frameStartTime > TIME_LIMIT or self.treeSize > MAX_TREE_SIZE or self.queue.length == 0

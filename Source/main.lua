@@ -88,7 +88,7 @@ function runGame()
 		playdate.timer.updateTimers()
 		stateGenerator:update()
 		if (showDebugElements) then
-			playdate.drawFPS(400, 10)
+			playdate.drawFPS(10, 220)
 		end
 	end
 end

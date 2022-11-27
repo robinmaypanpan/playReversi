@@ -71,6 +71,7 @@ function StateGenerator:setNewRoot(fromGameState, toMove)
 	self.treeSize -= 1	
 	
 	if (showDebugElements) then	
+		playdate.graphics.drawTextAligned(self.treeSize, playdate.display.getWidth() - 20, 220, kTextAlignment.right)
 	end
 end
 

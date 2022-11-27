@@ -3,7 +3,7 @@
 import 'CoreLibs/object'
 
 import 'location'
-import 'lib/queue'
+import 'lib/list'
 
 class('GameState').extends()
 
@@ -95,11 +95,10 @@ function GameState:init(copyState)
 		self.validMoves = List.new()
 		self.validMoveQueue = List.new()
 		self.numValidMoves = 0
-		for i = copyState.validMoves.first, copyState.validMoves.last do
-			local move = copyState.validMoves[i]
-			List.pushright(self.validMoves, move)
-			self.numValidMoves += 1
-		end
+		List.forEach(copyState.validMoves, function(move)			
+			List.pushEnd(self.validMoves, move)
+			self.numValidMoves += 1			
+		end)
 		
 	else		
 		-- Create a starter game state
@@ -150,8 +149,8 @@ function GameState:updateValidMoves()
 		for j=1,NUM_BOARD_SPACES do
 			local testPoint = Location.new(i,j)
 			if (self:calculateIfValidMove(testPoint)) then
-				List.pushright(self.validMoves, testPoint)
-				List.pushright(self.validMoveQueue, testPoint)
+				List.pushEnd(self.validMoves, testPoint)
+				List.pushEnd(self.validMoveQueue, testPoint)
 				self.numValidMoves+=1
 			end
 		end
@@ -238,14 +237,9 @@ end
 function GameState:isValidMove(location)
 	assert(location~=nil)
 	
-	for i = self.validMoves.first, self.validMoves.last do
-		local validMove = self.validMoves[i]
-		if (validMove.x == location.x and validMove.y == location.y) then
-			return true
-		end
-	end
-	
-	return false
+	return List.check(self.validMoves, function(validMove)
+		return validMove.x == location.x and validMove.y == location.y
+	end)
 end
 
 -- Function that returns true if the current player can make this move
@@ -280,15 +274,14 @@ function GameState:makeMove(location)
 	local validDirections = List.new()
 	for _,direction in pairs(MOVE_DIRECTIONS) do
 		if (self:checkDirectionForMove(location, direction)) then
-			List.pushright(validDirections, direction)
+			List.pushEnd(validDirections, direction)
 		end
 	end
 	
 	-- Execute all flips and update count as you go	
-	for i = validDirections.first, validDirections.last do
-		local direction = validDirections[i]
-		self:flipInDirection(location, direction)
-	end
+	List.forEach(validDirections, function(direction)		
+		self:flipInDirection(location, direction)		
+	end)
 	
 	-- Update current player
 	self.nonCurrentPlayer = self.currentPlayer

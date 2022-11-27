@@ -1,6 +1,6 @@
-name=Reversi
+name=FlipFlop
 author=Robin Mayorga
-description=Basic Reversi game with AI
-bundleID=com.artless-entertainment.reversi
+description=Reversi game with AI
+bundleID=com.robinmaypanpan.reversi
 version=0.1.1
 buildNumber=2

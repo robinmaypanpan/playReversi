@@ -96,3 +96,23 @@ function List.forEach(list, func)
     func(list[i])
   end
 end
+
+-- Returns a new list populated by the same elements, transformed by the provided function
+function List.map(list, func)
+  local newList = List.new()
+  List.forEach(list, function(element)
+    List.pushFront(func(element))    
+  end)
+  return newList
+end
+
+-- Returns a new list populated by the elements for which the test function returns true
+function List.filter(list, test)
+  local newList = List.new()
+  List.forEach(list, function(element)
+    if (test(element)) then
+      List.pushFront(element)
+    end
+  end)
+  return newList
+end

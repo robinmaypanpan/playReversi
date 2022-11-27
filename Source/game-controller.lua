@@ -55,6 +55,9 @@ end
 function GameController:restartGame()
 	self.board:clearBoard()
 	self:initializeGameState()
+	
+	-- Reset the state generator as well
+	stateGenerator:reset(self.gameState)
 end
 
 function GameController:makeMove(location)	

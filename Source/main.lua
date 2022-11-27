@@ -22,6 +22,11 @@ local board
 local whiteDisplay
 local blackDisplay
 
+-- Game state inputHandlers
+local gameController
+
+showDebugElements = true
+
 -- Sets up the game board display
 function setupBoard()
 	board = Board()
@@ -54,26 +59,38 @@ function setupGame()
 	math.randomseed(playdate.getSecondsSinceEpoch())
 end
 
--- Get the party started
-audio.init('assets/audio/pulp-songs.json', 'assets/audio/pulp-sounds.json')
-setupGame()
-
-local gameController = GameController(board, whiteDisplay, blackDisplay)
-gameController.whitePlayer = HumanPlayer(gameController, WHITE)
-gameController.blackPlayer = HumanPlayer(gameController, BLACK)
-
-stateGenerator = StateGenerator(gameController.gameState)
-
-gameController:startGame()
-
--- Update the system menu with our options
-local menuItem,error = playdate:getSystemMenu():addMenuItem("Restart Game", restartGame)
-
--- Standard main game loop
-function playdate.update()
-	frameStartTime = playdate.getCurrentTimeMilliseconds()
-	gfx.sprite.update()
-	audio.update() 
-	playdate.timer.updateTimers()
-	stateGenerator:update()
+-- Resets the game internals
+function restartGame()
+	gameController:restartGame()
 end
+
+-- Runs the game
+function runGame()
+	audio.init('assets/audio/pulp-songs.json', 'assets/audio/pulp-sounds.json')
+	setupGame()
+	
+	gameController = GameController(board, whiteDisplay, blackDisplay)
+	gameController.whitePlayer = HumanPlayer(gameController, WHITE)
+	gameController.blackPlayer = HumanPlayer(gameController, BLACK)
+	
+	stateGenerator = StateGenerator(gameController.gameState)
+	
+	gameController:startGame()
+	
+	-- Update the system menu with our options
+	local menuItem,error = playdate:getSystemMenu():addMenuItem("Restart Reverse", restartGame)
+	
+	-- Standard main game loop
+	function playdate.update()
+		frameStartTime = playdate.getCurrentTimeMilliseconds()
+		gfx.sprite.update()
+		audio.update() 
+		playdate.timer.updateTimers()
+		stateGenerator:update()
+		if (showDebugElements) then
+			playdate.drawFPS(400, 10)
+		end
+	end
+end
+
+runGame()

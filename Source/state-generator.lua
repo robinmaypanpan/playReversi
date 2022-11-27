@@ -54,10 +54,6 @@ function StateGenerator:setNewRoot(fromGameState, toMove)
 	local toMoveHash = hashMove(toMove)
 	local newTreeTop = self.tree[fromGameState][toMoveHash]		
 	self.treeTop = newTreeTop
-	
-	local startNewTime = playdate.getCurrentTimeMilliseconds()
-	print ('Setting new root with ' .. self.treeSize .. ' states')
-	local startTime = playdate.getCurrentTimeMilliseconds()
 
 	-- Clean up the move list first
 	for i = fromGameState.validMoves.first,fromGameState.validMoves.last do
@@ -73,8 +69,9 @@ function StateGenerator:setNewRoot(fromGameState, toMove)
 	
 	self.tree[fromGameState] = nil	
 	self.treeSize -= 1	
-		
-	print ('Finished making new root with ' .. self.treeSize .. ' states after ' .. playdate.getCurrentTimeMilliseconds() - startTime .. 'ms')
+	
+	if (showDebugElements) then	
+	end
 end
 
 -- Virtually executes this move by resetting the root and returning the new state
@@ -88,6 +85,18 @@ function StateGenerator:makeMove(gameState, move)
 	assert(newGameState == self.treeTop)
 	
 	return newGameState
+end
+
+-- Deletes all generated states and starts over with new states
+function StateGenerator:reset(newInitialGameState)
+	assert(newInitialGameState ~= nil)	
+	self.queue = List.new()
+	self.tree = {}	
+	self.tree[newInitialGameState] = {}
+	self.treeTop = newInitialGameState
+	self.treeSize = 1
+	
+	self:addToQueue(newInitialGameState)
 end
 
 function StateGenerator:update()
@@ -113,5 +122,8 @@ function StateGenerator:update()
 				end
 			end
 		until playdate.getCurrentTimeMilliseconds() - frameStartTime > TIME_LIMIT or self.treeSize > MAX_TREE_SIZE or self.queue.length == 0
+	end
+	if (showDebugElements) then		
+		playdate.graphics.drawTextAligned(self.treeSize, playdate.display.getWidth() - 20, 220, kTextAlignment.right)
 	end
 end

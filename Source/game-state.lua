@@ -5,8 +5,9 @@ import 'CoreLibs/object'
 import 'location'
 import 'lib/queue'
 
-
 class('GameState').extends()
+
+local THINK_TIME = 20
 
 -- Global constants anyone can use
 NUM_BOARD_SPACES = 8
@@ -20,14 +21,14 @@ GAME_OVER = 1
 
 -- A helpful list of all possible directions
 MOVE_DIRECTIONS = {
-	Location(-1,-1),
-	Location(-1,0),
-	Location(-1,1),
-	Location(0,-1),
-	Location(0,1),
-	Location(1,-1),
-	Location(1,0),
-	Location(1,1)
+	Location.new(-1,-1),
+	Location.new(-1,0),
+	Location.new(-1,1),
+	Location.new(0,-1),
+	Location.new(0,1),
+	Location.new(1,-1),
+	Location.new(1,0),
+	Location.new(1,1)
 }
 
 function getPieceString(color)
@@ -70,8 +71,7 @@ function GameState:init(copyState)
 		assert(copyState ~= nil)
 		-- Copy the other state
 		
-		-- Copy the board over
-		assert(copyState.board ~= nil)
+		-- Copy the values of the board over
 		for row = 1,NUM_BOARD_SPACES do
 			for col = 1,NUM_BOARD_SPACES do
 				if (copyState.board[row][col] ~= nil) then
@@ -84,21 +84,19 @@ function GameState:init(copyState)
 		
 		-- Copy the remaining state values
 		self.currentPlayer = copyState.currentPlayer
-		self.nonCurrentPlayer = invertColor(self.currentPlayer)
+		self.nonCurrentPlayer = copyState.nonCurrentPlayer
 		self.state = copyState.state
 		
 		-- Copy calculated data over
 		self.numWhitePieces = copyState.numWhitePieces
 		self.numBlackPieces = copyState.numBlackPieces
 		
-		assert(copyState.validMoves ~= nil)
+		-- Copy calculated moves over by value
 		self.validMoves = List.new()
-		self.childStates = {}
 		self.numValidMoves = 0
 		for i = copyState.validMoves.first, copyState.validMoves.last do
 			local move = copyState.validMoves[i]
 			List.pushright(self.validMoves, move)
-			self.childStates[move] = copyState.childStates[move]
 			self.numValidMoves += 1
 		end
 		
@@ -145,14 +143,12 @@ end
 -- Updates the array of all valid places to move
 function GameState:updateValidMoves()
 	self.validMoves = List.new()
-	self.childStates = {}
 	self.numValidMoves = 0
 	for i=1,NUM_BOARD_SPACES do
 		for j=1,NUM_BOARD_SPACES do
-			local testPoint = Location(i,j)
+			local testPoint = Location.new(i,j)
 			if (self:calculateIfValidMove(testPoint)) then
 				List.pushright(self.validMoves, testPoint)
-				self.childStates[testPoint] = false
 				self.numValidMoves+=1
 			end
 		end
@@ -161,7 +157,7 @@ end
 
 -- Add a piece of the current player at the indicated location
 function GameState:addCurrentPlayerPieceAt(location)
-	local row, col = location.unpack()
+	local row, col = Location.unpack(location)
 	self.board[row][col] = self.currentPlayer
 	if (self.currentPlayer == WHITE) then
 		self.numWhitePieces += 1
@@ -172,7 +168,7 @@ end
 
 -- Flip the piece at the indicated location
 function GameState:flipPieceToCurrentPlayerAt(location)
-	local row, col = location.unpack()
+	local row, col = Location.unpack(location)
 	self.board[row][col] = self.currentPlayer
 	if (self.currentPlayer == WHITE) then
 		self.numWhitePieces += 1
@@ -227,7 +223,7 @@ function GameState:flipInDirection(location, direction)
 	
 	-- start looping
 	repeat
-		nextLocation = nextLocation.add(direction)
+		nextLocation = Location.add(nextLocation, direction)
 		piece = self:readBoardAt(nextLocation)
 		if (piece ~= nil and piece == opponentColor) then
 			self:flipPieceToCurrentPlayerAt(nextLocation)
@@ -253,7 +249,7 @@ end
 function GameState:calculateIfValidMove(location)
 	assert(location ~= nil)
 	
-	local row,col = location.unpack()
+	local row,col = Location.unpack(location)
 	-- You can't move onto spaces that already have pieces
 	if (self.board[row][col] ~= nil) then 
 		return false 
@@ -271,21 +267,16 @@ function GameState:calculateIfValidMove(location)
 end
 
 -- Function to execute a move
-function GameState:makeMove(location, createNewState)	
-	local gameState = self	
-	if (createNewState) then
-		gameState = self:copy()
-	end	
-	
-	local row,col = location.unpack()
+function GameState:makeMove(location)	
+	local row,col = Location.unpack(location)
 	
 	-- Update the center space
-	gameState:addCurrentPlayerPieceAt(location)	
+	self:addCurrentPlayerPieceAt(location)	
 	
 	-- Check for all flips in all directions
 	local validDirections = List.new()
 	for _,direction in pairs(MOVE_DIRECTIONS) do
-		if (gameState:checkDirectionForMove(location, direction)) then
+		if (self:checkDirectionForMove(location, direction)) then
 			List.pushright(validDirections, direction)
 		end
 	end
@@ -293,42 +284,35 @@ function GameState:makeMove(location, createNewState)
 	-- Execute all flips and update count as you go	
 	for i = validDirections.first, validDirections.last do
 		local direction = validDirections[i]
-		gameState:flipInDirection(location, direction)
+		self:flipInDirection(location, direction)
 	end
 	
 	-- Update current player
-	gameState.currentPlayer = invertColor(gameState.currentPlayer)
+	self.nonCurrentPlayer = self.currentPlayer
+	self.currentPlayer = invertColor(self.currentPlayer)	
 	
 	-- Update valid moves
-	gameState:updateValidMoves()
+	self:updateValidMoves()
 	
 	-- Check to see if we have any actual valid moves
-	if (gameState.numValidMoves == 0) then			
+	if (self.numValidMoves == 0) then		
 		-- Update current player
-		gameState.currentPlayer = invertColor(gameState.currentPlayer)
+		self.nonCurrentPlayer = self.currentPlayer
+		self.currentPlayer = invertColor(self.currentPlayer)
 			
 		-- Update valid moves
-		gameState:updateValidMoves()
+		self:updateValidMoves()
 		
-		if (gameState.numValidMoves == 0) then
+		if (self.numValidMoves == 0) then
 			-- if we have to pass twice, the game is over
-			gameState.state = GAME_OVER
-			gameState.currentPlayer = -1
+			self.state = GAME_OVER
+			self.nonCurrentPlayer = -1
+			self.currentPlayer = -1
 		end
 	end
-	return gameState
 end
 
 -- Returns a copy of this game state
 function GameState:copy()
 	return GameState(self)
-end
-
--- A helper function to build out the possible move tree
-function GameState:generateChildren()
-	-- for _,move in pairs(self.validMoves) do
-	-- 	local newState = self:makeMove(move, true)
-	-- 	self.childStates[move] = newState
-	-- 	coroutine.yield()
-	-- end
 end

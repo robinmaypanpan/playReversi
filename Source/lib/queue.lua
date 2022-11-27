@@ -37,3 +37,12 @@ function List.popright (list)
 	list.length-=1
   return value
 end
+
+function List.find(list, test)
+  for i = list.first, list.last do
+    if (test(list[i])) then
+      return true
+    end
+  end
+  return false
+end

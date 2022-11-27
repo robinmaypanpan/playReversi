@@ -11,6 +11,7 @@ import 'players/human-player'
 import 'players/random-ai'
 import 'players/minimax-ai'
 import 'game-controller'
+import 'state-generator'
 
 -- Save typing!
 local gfx = playdate.graphics
@@ -20,6 +21,11 @@ local audio = pulp.audio
 local board
 local whiteDisplay
 local blackDisplay
+
+-- Game state inputHandlers
+local gameController
+
+showDebugElements = true
 
 -- Sets up the game board display
 function setupBoard()
@@ -53,24 +59,40 @@ function setupGame()
 	math.randomseed(playdate.getSecondsSinceEpoch())
 end
 
--- Get the party started
-audio.init('assets/audio/pulp-songs.json', 'assets/audio/pulp-sounds.json')
-setupGame()
-
-local gameController = GameController(board, whiteDisplay, blackDisplay)
-gameController.whitePlayer = HumanPlayer(gameController, WHITE)
-gameController.blackPlayer = MinimaxAi(gameController, BLACK)
-
-gameController:startGame()
-
--- Update the system menu with our options
-local menuItem,error = playdate:getSystemMenu():addMenuItem("Restart Game", restartGame)
-
--- Standard main game loop
-function playdate.update()
-	frameStartTime = playdate.getCurrentTimeMilliseconds()
-	gfx.sprite.update()
-	audio.update() 
-	playdate.timer.updateTimers()
-	gameController.gameState:generateChildren()
+-- Resets the game internals
+function restartGame()
+	gameController:restartGame()
 end
+
+-- Runs the game
+function runGame()
+	audio.init('assets/audio/pulp-songs.json', 'assets/audio/pulp-sounds.json')
+	setupGame()
+	
+	gameController = GameController(board, whiteDisplay, blackDisplay)
+	gameController.whitePlayer = HumanPlayer(gameController, WHITE)
+	gameController.blackPlayer = HumanPlayer(gameController, BLACK)
+	
+	stateGenerator = StateGenerator(gameController.gameState)
+	
+	gameController:startGame()
+	
+	-- Update the system menu with our options
+	local menuItem,error = playdate:getSystemMenu():addMenuItem("Restart Reverse", restartGame)
+	
+	-- Standard main game loop
+	function playdate.update()
+		frameStartTime = playdate.getCurrentTimeMilliseconds()
+		gfx.sprite.update()
+		audio.update() 
+		playdate.timer.updateTimers()
+		stateGenerator:update()
+		
+		if (showDebugElements) then
+			playdate.drawFPS(10, 220)
+			playdate.graphics.drawTextAligned(stateGenerator.treeSize, playdate.display.getWidth() - 20, 220, kTextAlignment.right)
+		end
+	end
+end
+
+runGame()

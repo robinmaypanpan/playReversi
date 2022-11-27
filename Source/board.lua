@@ -17,7 +17,7 @@ local BOARD_SIZE = NUM_BOARD_SPACES * SPACE_SIZE
 
 function Board:init()
 	Board.super.init(self)
-	self.cursorPosition = Location(1,1)
+	self.cursorPosition = Location.new(1,1)
 	
 	self:createBoardData()
 	
@@ -87,7 +87,7 @@ end
 
 -- Calculates the center x,y coordinates of the indicated row,col space
 function Board:calculateSpaceCenter(rcLocation)
-	local row, col = rcLocation:unpack()
+	local row, col = Location.unpack(rcLocation)
 	local distanceFromCenterToEdge = ((NUM_BOARD_SPACES - 1 ) / 2) * SPACE_SIZE
 	
 	local firstRowCenter = self.y - distanceFromCenterToEdge
@@ -96,17 +96,18 @@ function Board:calculateSpaceCenter(rcLocation)
 	local y = firstRowCenter + (row - 1) * SPACE_SIZE + 1
 	local x = firstColCenter + (col - 1) * SPACE_SIZE + 1
 	
-	return Location(x,y)
+	return Location.new(x,y)
 end
 
 -- adds a piece at the indicated location
 function Board:addPiece(location, pieceColor)
-	local row,col = location.unpack()
+	local row,col = Location.unpack(location)
 	local piece = Piece(SPACE_SIZE, pieceColor)
 	
 	self.data[row][col] = piece
 	
-	local x, y = self:calculateSpaceCenter(location).unpack()
+	local spaceCenter = self:calculateSpaceCenter(location)
+	local x,y = Location.unpack(spaceCenter)
 	
 	piece:moveTo(x, y)
 	piece:add()
@@ -127,7 +128,7 @@ function Board:canFlipInDirection(location, direction, centerColor)
 	
 	-- start looping
 	repeat
-		nextLocation = nextLocation.add(direction)
+		nextLocation = Location.add(nextLocation, direction)
 		piece = self:getPieceAt(nextLocation)
 		if (piece and piece.pieceColor == opponentColor) then
 			foundAnOpponentPiece = true
@@ -148,7 +149,7 @@ function Board:flipInDirection(location, direction)
 	assert(direction ~= nil)
 	
 	-- Start by grabbing our starting point information	
-	local row,col = location.unpack()
+	local row,col = Location.unpack(location)
 	local centerPiece = self.data[row][col]	
 	assert(centerPiece ~= nil)
 	
@@ -163,7 +164,7 @@ function Board:flipInDirection(location, direction)
 	
 	-- start looping
 	repeat
-		nextLocation = nextLocation.add(direction)
+		nextLocation = Location.add(nextLocation, direction)
 		piece = self:getPieceAt(nextLocation)
 		pieceColor = piece.pieceColor
 		if (piece and piece.pieceColor == opponentColor) then
@@ -177,7 +178,7 @@ end
 -- Should be replaced by a crank action to flip all the pieces.
 function Board:flipPiecesAround(location)	
 	assert(location ~= nil)
-	local row,col = location.unpack()
+	local row,col = Location.unpack(location)
 	
 	-- Start by grabbing a bunch of our pieces
 	local centerPiece = self.data[row][col]	
@@ -205,7 +206,7 @@ function Board:addCursor()
 	end
 	self.cursor = Cursor(SPACE_SIZE)
 	self.cursor:add()
-	self.cursorPosition = Location(1,1)
+	self.cursorPosition = Location.new(1,1)
 end
 
 -- Sets the position of the cursor
@@ -214,7 +215,7 @@ function Board:setCursorPosition(newLocation)
 	assert(self:isOnBoard(newLocation))	
 	self.cursorPosition = newLocation
 	local newScreenPosition = self:calculateSpaceCenter(newLocation)	
-	local x,y = newScreenPosition.unpack()
+	local x,y = Location.unpack(newScreenPosition)
 	self.cursor:moveTo(x,y)
 end
 
@@ -228,9 +229,24 @@ end
 -- Return the piece at a given location
 function Board:getPieceAt(location)
 	if (self:isOnBoard(location)) then
-		local row,col = location.unpack()
+		local row,col = Location.unpack(location)
 		return self.data[row][col]
 	else
 		return nil
+	end
+end
+
+-- Validates that the board matches the state of the game state
+function Board:validateGameState(gameState)
+	local gameStateBoard = gameState.board
+	for i = 1,NUM_BOARD_SPACES do
+		for j = 1,NUM_BOARD_SPACES do
+			local boardPiece = self:getPieceAt(Location.new(i,j))
+			if (boardPiece == nil) then
+				assert(gameStateBoard[i][j] == nil)
+			else
+				assert(boardPiece.pieceColor == gameStateBoard[i][j])
+			end
+		end
 	end
 end

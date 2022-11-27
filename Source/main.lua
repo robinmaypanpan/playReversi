@@ -87,8 +87,10 @@ function runGame()
 		audio.update() 
 		playdate.timer.updateTimers()
 		stateGenerator:update()
+		
 		if (showDebugElements) then
 			playdate.drawFPS(10, 220)
+			playdate.graphics.drawTextAligned(stateGenerator.treeSize, playdate.display.getWidth() - 20, 220, kTextAlignment.right)
 		end
 	end
 end

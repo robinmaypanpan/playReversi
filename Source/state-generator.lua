@@ -69,10 +69,6 @@ function StateGenerator:setNewRoot(fromGameState, toMove)
 	
 	self.tree[fromGameState] = nil	
 	self.treeSize -= 1	
-	
-	if (showDebugElements) then	
-		playdate.graphics.drawTextAligned(self.treeSize, playdate.display.getWidth() - 20, 220, kTextAlignment.right)
-	end
 end
 
 -- Virtually executes this move by resetting the root and returning the new state
@@ -123,8 +119,5 @@ function StateGenerator:update()
 				end
 			end
 		until playdate.getCurrentTimeMilliseconds() - frameStartTime > TIME_LIMIT or self.treeSize > MAX_TREE_SIZE or self.queue.length == 0
-	end
-	if (showDebugElements) then		
-		playdate.graphics.drawTextAligned(self.treeSize, playdate.display.getWidth() - 20, 220, kTextAlignment.right)
 	end
 end

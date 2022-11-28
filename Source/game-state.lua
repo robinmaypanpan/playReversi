@@ -191,23 +191,26 @@ function GameState:checkDirectionForMove(location, direction)
 	local nextRow = location.x
 	local nextCol = location.y
 	local piece
+	local currentPlayer = self.currentPlayer
+	local nonCurrentPlayer = self.nonCurrentPlayer
+	local board = self.board
 	
 	-- start looping
 	repeat
 		nextRow += direction.x
 		nextCol += direction.y
 		if (nextRow >= 1 and nextRow <= NUM_BOARD_SPACES and nextCol >= 1 and nextCol <= NUM_BOARD_SPACES) then
-			piece = self.board[nextRow][nextCol]
-			if (piece == self.nonCurrentPlayer) then			
+			piece = board[nextRow][nextCol]
+			if (piece == nonCurrentPlayer) then			
 				foundAnOpponentPiece = true
 			end
 		else
 			piece = nil
 		end
-	until piece == nil or piece == self.currentPlayer
+	until piece == nil or piece == currentPlayer
 	
 	-- If we found at least one opponent piece AND we ended on one of our own pieces, we're good
-	if (foundAnOpponentPiece and piece ~= nil and piece == self.currentPlayer) then
+	if (foundAnOpponentPiece and piece ~= nil and piece == currentPlayer) then
 		return true
 	end
 	

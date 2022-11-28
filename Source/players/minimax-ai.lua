@@ -4,10 +4,9 @@ import 'game-state'
 import 'players/base-ai'
 
 local MAX_DEPTH = 2
-local THINK_TIME = 30
 
-local MAX_VALUE = 99999999
-local MIN_VALUE = -99999999
+local MAX_VALUE = 9999999
+local MIN_VALUE = -9999999
 
 class('MinimaxAi').extends(BaseAi)
 

@@ -116,6 +116,9 @@ end
 -- Runs the game
 function runGame()
 	audio.init('assets/audio/pulp-songs.json', 'assets/audio/pulp-sounds.json')
+	
+	playdate.setMinimumGCTime(5)
+	
 	setupGame()
 	
 	gameController = GameController(board, whiteDisplay, blackDisplay)

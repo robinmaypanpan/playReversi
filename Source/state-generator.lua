@@ -4,9 +4,9 @@ import 'game-state'
 import 'lib/list'
 
 local MS_PER_FRAME <const> = 1000 // playdate.display.getRefreshRate()
-local TIME_LIMIT = 0.9 * MS_PER_FRAME
+local TIME_LIMIT = 0.8 * MS_PER_FRAME
 local MAX_DEPTH = 5
-local MAX_TREE_SIZE = 3000
+local MAX_TREE_SIZE = 2000
 
 -- Returns a hash of the move
 function hashMove(move)

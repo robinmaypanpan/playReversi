@@ -49,7 +49,7 @@ function setupUI()
 		
 	local backgroundImage = gfx.image.new(screenWidth, screenHeight)
 	gfx.pushContext(backgroundImage)
-		gfx.setDitherPattern(0.7)
+		gfx.setDitherPattern(0.5)
 		gfx.fillRect(0, 0, screenWidth, screenHeight)
 	gfx.popContext()		
 	

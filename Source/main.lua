@@ -5,8 +5,8 @@ import "CoreLibs/timer"
 
 import "lib/pulp-audio"
 
-import 'board'
-import 'player-display'
+import 'ui/board'
+import 'ui/player-display'
 import 'players/human-player'
 import 'players/random-ai'
 import 'players/minimax-ai'
@@ -25,7 +25,7 @@ local blackDisplay
 -- Game state inputHandlers
 local gameController
 
-local showDebugElements = true
+local showDebugElements = false
 
 -- Sets up the game board display
 function setupBoard()

@@ -103,7 +103,7 @@ function StateGenerator:update()
 			local fromGameState = List.peekFront(self.queue)
 			
 			-- We are working on the depth below this one
-			self.depth = fromGameState.depth + 1 - topDepth + 1
+			self.depth = fromGameState.depth + 1 - topDepth
 						
 			if (self.tree[fromGameState] == nil or fromGameState.validMoveQueue.length == 0) then
 				-- If the state is dead or there are no moves left to process, remove it from the queue and move on	

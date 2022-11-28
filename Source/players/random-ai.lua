@@ -9,7 +9,7 @@ function RandomAi:init(gameController, myColor)
 end
 
 -- Returns the move this AI wants to play
-function RandomAi:chooseMove()
+function RandomAi:thinkAboutMove()
 	assert(self.gameController ~= nil)
 	local gameController = self.gameController
 	local gameState = gameController.gameState

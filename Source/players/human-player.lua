@@ -43,7 +43,7 @@ end
 function HumanPlayer:attemptPlacement()	
 	local cursorPosition = self.gameController.board.cursorPosition
 	if (self.gameController.gameState:isValidMove(cursorPosition)) then		
-		playdate.inputHandlers.pop()
+		self:shutDown()
 		self.gameController:makeMove(cursorPosition)
 	else
 		audio.playSound('invalid')
@@ -51,7 +51,7 @@ function HumanPlayer:attemptPlacement()
 end
 
 -- Signals the player to take their turn
-function HumanPlayer:takeTurn()	
+function HumanPlayer:chooseMove()	
 	-- Setup the input handlers to handle controls
 	local playerInputHandlers = {
 		downButtonDown = function()	

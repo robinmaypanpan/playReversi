@@ -11,11 +11,12 @@ class('BaseAi').extends(Player)
 
 function BaseAi:init(gameController, myColor)
 	BaseAi.super.init(self, gameController, myColor)
+	self.stateGenerator = stateGenerator
 end
 
-function BaseAi:takeTurn()
+function BaseAi:chooseMove()
 	local gameController = self.gameController
-	
+		
 	local function onComplete(chosenMove)
 		playdate.timer.performAfterDelay(500, function() 
 			gameController:moveCursorTo(chosenMove) 
@@ -25,8 +26,8 @@ function BaseAi:takeTurn()
 		end)
 	end
 	
-	playdate.timer.performAfterDelay(10, function()
-		local chosenMove = self:chooseMove()
+	playdate.timer.performAfterDelay(10, function()		
+		local chosenMove = self:thinkAboutMove()
 		playdate.timer.performAfterDelay(10, function()
 			onComplete(chosenMove)
 		end)
@@ -34,7 +35,7 @@ function BaseAi:takeTurn()
 end
 
 -- Returns the move this AI wants to play
-function BaseAi:chooseMove()	
+function BaseAi:thinkAboutMove()	
 	-- Should never be called in the base
 	assert(false)
 end

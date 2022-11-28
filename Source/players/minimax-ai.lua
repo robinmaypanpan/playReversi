@@ -18,13 +18,13 @@ function MinimaxAi:init(gameController, myColor)
 		lose = -1000,
 		draw = 0,
 		totalPieceDifference = 1,
-		cornerPieceBonus = 25, -- In addition to just having the piece out there
+		cornerPieceBonus = 30, -- In addition to just having the piece out there
 		edgePieceBonus = 2 -- In addition to the edge piece
 	}
 end
 
 -- Returns the move this AI wants to play
-function MinimaxAi:chooseMove()		
+function MinimaxAi:thinkAboutMove()		
 	return self:minimax(self.gameController.gameState, MAX_DEPTH).move
 end
 
@@ -145,9 +145,13 @@ function MinimaxAi:getValueDifference(piece, weight)
 	if (cornerPiece == myColor) then
 		return weight
 	elseif (cornerPiece == opponentColor) then
-		return -weight
+		return 0-weight
 	else
 		-- No effect if the piece does not exist
 		return 0
 	end
+end
+
+function MinimaxAi:isReady()
+	return stateGenerator.depth > MAX_DEPTH
 end

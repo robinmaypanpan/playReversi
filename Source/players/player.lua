@@ -14,11 +14,27 @@ function Player:init(gameController, myColor)
 end
 
 -- Called to tell this player to take their turn
-function Player:takeTurn()	
-	-- Should never be called in the base
+function Player:takeTurn()		
+	if (self:isReady()) then
+		self:chooseMove()
+	else
+		playdate.timer.performAfterDelay(200, function()
+			self:takeTurn()
+		end)
+	end
+end
+
+-- Called to request a move from this player
+function Player:chooseMove()
+	-- Should never be called on the base class
 	assert(false)
 end
 
 -- Called when this player no longer should exist
 function Player:shutDown()
+end
+
+-- Returns true if the player is ready to make a move
+function Player:isReady()
+	return stateGenerator.depth > 2
 end

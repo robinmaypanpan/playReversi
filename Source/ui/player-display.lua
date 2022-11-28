@@ -28,6 +28,11 @@ end
 function PlayerDisplay:drawDisplay()
 	local image = gfx.image.new(width, height)
 	gfx.pushContext(image)
+		gfx.setColor(gfx.kColorWhite)
+		
+		-- Draw the background
+		gfx.fillRect(0, 0, width, height)
+				
 		gfx.setColor(gfx.kColorBlack)
 		
 		-- Draw the background first

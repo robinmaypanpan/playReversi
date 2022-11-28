@@ -27,19 +27,8 @@ local gameController
 
 local showDebugElements = false
 
--- Sets up the game board display
-function setupBoard()
-	board = Board()
-	
-	local screenWidth = playdate.display.getWidth()
-	local screenHeight = playdate.display.getHeight()
-	board:moveTo(screenWidth / 2, screenHeight / 2)
-	
-	board:add()
-end
-
 -- Sets up the display of the game
-function setupGame()
+function setupUI()
 	-- Setup the player displays first	
 	local pieceTable = gfx.imagetable.new('assets/images/piece')
 	local whitePieceImage = pieceTable[1]
@@ -53,10 +42,30 @@ function setupGame()
 	blackDisplay:add()
 	blackDisplay:moveTo(320,15)
 	
-	setupBoard()
-	board:addCursor()
+	local screenWidth = playdate.display.getWidth()
+	local screenHeight = playdate.display.getHeight()
 	
-	math.randomseed(playdate.getSecondsSinceEpoch())
+	board = Board()
+		
+	local backgroundImage = gfx.image.new(screenWidth, screenHeight)
+	gfx.pushContext(backgroundImage)
+		gfx.setDitherPattern(0.7)
+		gfx.fillRect(0, 0, screenWidth, screenHeight)
+	gfx.popContext()		
+	
+	gfx.sprite.setBackgroundDrawingCallback(
+		function( x, y, width, height )
+			-- x,y,width,height is the updated area in sprite-local coordinates
+			-- The clip rect is already set to this area, so we don't need to set it ourselves
+			backgroundImage:draw( 0, 0 )
+		end
+	)
+	-- Create background
+	
+	
+	board:moveTo(screenWidth / 2, screenHeight / 2)	
+	board:add()	
+	board:addCursor()
 end
 
 -- Resets the game internals
@@ -117,9 +126,10 @@ end
 function runGame()
 	audio.init('assets/audio/pulp-songs.json', 'assets/audio/pulp-sounds.json')
 	
-	playdate.setMinimumGCTime(5)
+	playdate.setMinimumGCTime(5)		
+	math.randomseed(playdate.getSecondsSinceEpoch())
 	
-	setupGame()
+	setupUI()
 	
 	gameController = GameController(board, whiteDisplay, blackDisplay)
 	gameController.whitePlayer = HumanPlayer(gameController, WHITE)

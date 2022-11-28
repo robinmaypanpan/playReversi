@@ -52,11 +52,12 @@ end
 function Board:drawBoard()
 	local boardImage = gfx.image.new(BOARD_SIZE+10, BOARD_SIZE+10)
 	gfx.pushContext(boardImage)
-		gfx.setColor(gfx.kColorBlack)
+		gfx.setColor(gfx.kColorWhite)
 		
 		-- Draw the board background
-		gfx.setDitherPattern(0.99)
 		gfx.fillRect(PADDING, PADDING, BOARD_SIZE, BOARD_SIZE)
+				
+		gfx.setColor(gfx.kColorBlack)
 		
 		-- Draw the board squares
 		gfx.setDitherPattern(0)
@@ -76,6 +77,18 @@ function Board:drawBoard()
 				PADDING, PADDING + row*SPACE_SIZE, 
 				PADDING + BOARD_SIZE, PADDING + row*SPACE_SIZE)
 		end
+		
+		-- Draw the dots
+		local circleDistance = PADDING + 2 * SPACE_SIZE
+		local circleRadius = 3
+		gfx.fillCircleAtPoint(circleDistance, circleDistance, circleRadius)
+		gfx.fillCircleAtPoint(BOARD_SIZE+10 - circleDistance, circleDistance, circleRadius)
+		gfx.fillCircleAtPoint(circleDistance, BOARD_SIZE+10 - circleDistance, circleRadius)
+		gfx.fillCircleAtPoint(BOARD_SIZE+10 - circleDistance, BOARD_SIZE+10 - circleDistance, circleRadius)
+		
+		local centerPosition = PADDING + 4 * SPACE_SIZE
+		gfx.fillCircleAtPoint(centerPosition, centerPosition, circleRadius)
+		
 		
 		-- Draw an outline around the entire board	
 		gfx.setStrokeLocation(gfx.kStrokeOutside)

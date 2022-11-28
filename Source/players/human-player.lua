@@ -40,11 +40,22 @@ function HumanPlayer:moveLeft()
 	end)
 end
 
+function HumanPlayer:doMove(location)
+	if (stateGenerator.depth > 2) then
+		-- We have enough states to do this	
+		self.gameController:makeMove(location)
+	else		
+		playdate.timer.performAfterDelay(200, function()
+			self:doMove(location)
+		end)
+	end
+end
+
 function HumanPlayer:attemptPlacement()	
 	local cursorPosition = self.gameController.board.cursorPosition
 	if (self.gameController.gameState:isValidMove(cursorPosition)) then		
 		self:shutDown()
-		self.gameController:makeMove(cursorPosition)
+		self:doMove(cursorPosition)
 	else
 		audio.playSound('invalid')
 	end
@@ -103,4 +114,9 @@ end
 
 function HumanPlayer:shutDown()
 	playdate.inputHandlers.pop()
+end
+
+function HumanPlayer:isReady()
+	-- The human player can immediately move around, but cannot select right away
+	return true
 end

@@ -16,7 +16,7 @@ function Piece:init(spaceSize, initialColor)
 	self.pieceColor = initialColor
 	self.diameter = spaceSize - 5
 	
-	self:addState('black', 1, 7, {tickStep = 2, loop=false})
+	self:addState('black', 2, 7, {tickStep = 2, loop=false})
 	self:addState('white', 1, 6, {tickStep = 2, loop=false, reverse=true})
 	
 	if(initialColor == 0) then

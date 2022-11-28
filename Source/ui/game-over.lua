@@ -38,7 +38,7 @@ function GameOver:init(winnerName, winnerScore, loserScore)
 		
 		-- Call to action		
 		gfx.setFont(font)
-		gfx.drawTextAligned('Press A to restart game!', width / 2,110,kTextAlignment.center)
+		gfx.drawTextAligned('Press Ⓐ to restart game!', width / 2,110,kTextAlignment.center)
 		
 	gfx.popContext()
 end

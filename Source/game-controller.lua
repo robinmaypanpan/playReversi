@@ -58,6 +58,8 @@ function GameController:restartGame()
 	
 	-- Reset the state generator as well
 	stateGenerator:reset(self.gameState)
+	
+	self:notifyPlayerTurn()
 end
 
 function GameController:makeMove(location)	

@@ -100,3 +100,7 @@ function HumanPlayer:takeTurn()
 	}
 	playdate.inputHandlers.push(playerInputHandlers)
 end
+
+function HumanPlayer:shutDown()
+	playdate.inputHandlers.pop()
+end

@@ -35,7 +35,7 @@ function PlayerDisplay:drawDisplay()
 		
 		-- Now draw the name and score
 		gfx.setFont(font)
-		gfx.drawTextAligned(self.name, width / 2,5,kTextAlignment.center)
+		gfx.drawTextAligned(self.name, width / 2,8,kTextAlignment.center)
 		
 		gfx.drawTextAligned(self.score, width / 2,55,kTextAlignment.center)
 		

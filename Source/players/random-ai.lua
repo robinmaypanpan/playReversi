@@ -14,8 +14,8 @@ function RandomAi:chooseMove()
 	local gameController = self.gameController
 	local gameState = gameController.gameState
 		
-	local chosenMoveIndex = math.random(1, gameState.validMoves.length)
-	local chosenMove = gameState.validMoves[chosenMoveIndex]	
+	local chosenMoveIndex = math.random(gameState.validMoves.first, gameState.validMoves.last)
+	local chosenMove = gameState.validMoves[chosenMoveIndex]
 	
 	return chosenMove
 end

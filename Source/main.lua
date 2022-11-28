@@ -69,6 +69,50 @@ function toggleDebug(newValue)
 	showDebugElements = newValue
 end
 
+local playerOptions = {
+	'Human',
+	'Easy AI',
+	'Hard AI'
+}
+
+-- Change the white player and restart
+function changeWhitePlayer(newPlayerString)
+	gameController.whitePlayer:shutDown()
+	
+	local newPlayer
+	if (newPlayerString == 'Human') then
+		newPlayer = HumanPlayer(gameController, WHITE)
+	elseif (newPlayerString == 'Easy AI') then
+		newPlayer = RandomAi(gameController, WHITE)
+	elseif (newPlayerString == 'Hard AI') then
+		newPlayer = MinimaxAi(gameController, WHITE)
+	else
+		error('No Player returned')
+	end
+	
+	gameController.whitePlayer = newPlayer
+	gameController:restartGame()
+end
+
+-- Change the black player and restart
+function changeBlackPlayer(newPlayerString)
+	gameController.blackPlayer:shutDown()
+	
+	local newPlayer
+	if (newPlayerString == 'Human') then
+		newPlayer = HumanPlayer(gameController, BLACK)
+	elseif (newPlayerString == 'Easy AI') then
+		newPlayer = RandomAi(gameController, BLACK)
+	elseif (newPlayerString == 'Hard AI') then
+		newPlayer = MinimaxAi(gameController, BLACK)
+	else
+		error('No Player returned')	
+	end
+	
+	gameController.blackPlayer = newPlayer
+	gameController:restartGame()
+end
+
 -- Runs the game
 function runGame()
 	audio.init('assets/audio/pulp-songs.json', 'assets/audio/pulp-sounds.json')
@@ -80,11 +124,10 @@ function runGame()
 	
 	stateGenerator = StateGenerator(gameController.gameState)
 	
-	gameController:startGame()
-	
 	-- Update the system menu with our options
 	playdate:getSystemMenu():addMenuItem('Restart Game', restartGame)
-	playdate:getSystemMenu():addCheckmarkMenuItem('Debug', showDebugElements, toggleDebug)
+	playdate:getSystemMenu():addOptionsMenuItem('White', playerOptions,'Human', changeWhitePlayer)
+	playdate:getSystemMenu():addOptionsMenuItem('Black', playerOptions, 'Hard AI', changeBlackPlayer)
 	
 	-- Standard main game loop
 	function playdate.update()
@@ -99,6 +142,8 @@ function runGame()
 			playdate.graphics.drawTextAligned(stateGenerator.depth .. '-' .. stateGenerator.treeSize, playdate.display.getWidth() - 20, 220, kTextAlignment.right)
 		end
 	end
+		
+	gameController:startGame()
 end
 
 runGame()

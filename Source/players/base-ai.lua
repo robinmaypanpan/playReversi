@@ -25,7 +25,7 @@ function BaseAi:takeTurn()
 		end)
 	end
 	
-	playdate.timer.performAfterDelay(250, function()
+	playdate.timer.performAfterDelay(10, function()
 		local chosenMove = self:chooseMove()
 		playdate.timer.performAfterDelay(10, function()
 			onComplete(chosenMove)

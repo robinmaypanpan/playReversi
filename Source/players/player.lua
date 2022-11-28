@@ -13,7 +13,12 @@ function Player:init(gameController, myColor)
 	self.myColor = myColor
 end
 
+-- Called to tell this player to take their turn
 function Player:takeTurn()	
 	-- Should never be called in the base
 	assert(false)
+end
+
+-- Called when this player no longer should exist
+function Player:shutDown()
 end

@@ -205,7 +205,7 @@ function GameState:checkDirectionForMove(location, direction)
 				foundAnOpponentPiece = true
 			end
 		else
-			piece = nil
+			return false
 		end
 	until piece == nil or piece == currentPlayer
 	

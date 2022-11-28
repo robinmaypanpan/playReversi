@@ -3,4 +3,4 @@ author=Robin Mayorga
 description=Reversi game with AI
 bundleID=com.robinmaypanpan.reversi
 version=0.1.1
-buildNumber=3
+buildNumber=4

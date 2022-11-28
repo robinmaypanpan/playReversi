@@ -22,6 +22,8 @@ function Board:init()
 	self:createBoardData()
 	
 	self:setImage(self:drawBoard())
+	
+	self:addCursor()
 end
 
 -- Removes everything from the board
@@ -215,11 +217,18 @@ end
 -- Adds a cursor to the board
 function Board:addCursor()	
 	if (self.cursor) then
-		self.cursor.remove()
+		self.cursor:remove()
 	end
 	self.cursor = Cursor(SPACE_SIZE)
 	self.cursor:add()
-	self.cursorPosition = Location.new(1,1)
+	self:setCursorPosition(Location.new(1,1))
+end
+
+-- Removes the cursor from the board
+function Board:removeCursor()
+	if (self.cursor) then
+		self.cursor:remove()
+	end
 end
 
 -- Sets the position of the cursor

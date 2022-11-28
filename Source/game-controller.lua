@@ -2,6 +2,8 @@
 
 import 'CoreLibs/object'
 
+import 'ui/game-over'
+
 import "lib/pulp-audio"
 
 import 'game-state'
@@ -52,14 +54,48 @@ function GameController:initializeGameState()
 end
 
 -- Called to restart the game
-function GameController:restartGame()
-	self.board:clearBoard()
+function GameController:restartGame()	
+	self.board:clearBoard()	
 	self:initializeGameState()
+	self.board:addCursor()
+	self.board:setCursorPosition(self.gameState.validMoves[1])
+	self.board.cursor:setValidPosition(true)
 	
 	-- Reset the state generator as well
 	stateGenerator:reset(self.gameState)
 	
+	if (self.gameOverDisplay) then
+		self.gameOverDisplay:remove()
+		self.gameOverDisplay = nil
+	end
+	
 	self:notifyPlayerTurn()
+end
+
+-- Shows the game over display
+function GameController:showGameOver(endGameState)	
+	if (endGameState.numWhitePieces > endGameState.numBlackPieces) then			
+		self.gameOverDisplay = GameOver('Light', endGameState.numWhitePieces, endGameState.numBlackPieces)
+	else
+		self.gameOverDisplay = GameOver('Dark', endGameState.numBlackPieces, endGameState.numWhitePieces)
+	end
+	local gameOverDisplay = self.gameOverDisplay
+	
+	gameOverDisplay:add()
+	
+	local screenWidth = playdate.display.getWidth()
+	local screenHeight = playdate.display.getHeight()
+	gameOverDisplay:moveTo(screenWidth / 2, screenHeight / 2)
+	gameOverDisplay:add()
+	board:removeCursor()
+			
+	local playerInputHandlers = {
+		AButtonDown = function()
+			playdate.inputHandlers.pop()
+			self:restartGame()
+		end
+	}
+	playdate.inputHandlers.push(playerInputHandlers)
 end
 
 function GameController:makeMove(location)	
@@ -81,8 +117,8 @@ function GameController:makeMove(location)
 	self.whiteDisplay:setActive(newGameState.currentPlayer == WHITE)
 	self.blackDisplay:setActive(newGameState.currentPlayer == BLACK)
 	
-	if (newGameState.state == GAME_OVER) then
-		print('Game over! Restart to play again!')
+	if (newGameState.state == GAME_OVER) then	
+		self:showGameOver(newGameState)
 	else
 		self:notifyPlayerTurn()
 	end

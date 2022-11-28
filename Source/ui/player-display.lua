@@ -35,7 +35,8 @@ function PlayerDisplay:drawDisplay()
 				
 		gfx.setColor(gfx.kColorBlack)
 		
-		-- Draw the background first
+		-- Draw the background outline
+		gfx.setLineWidth(3)
 		gfx.drawRect(0, 0, width, height)
 		
 		-- Now draw the name and score

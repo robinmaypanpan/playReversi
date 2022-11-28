@@ -7,20 +7,17 @@ import "lib/pulp-audio"
 
 import 'ui/board'
 import 'ui/player-display'
+
 import 'players/human-player'
 import 'players/random-ai'
 import 'players/minimax-ai'
+
 import 'game-controller'
 import 'state-generator'
 
 -- Save typing!
 local gfx = playdate.graphics
 local audio = pulp.audio
-
--- UI elements we construct here and give control to the game controller
-local board
-local whiteDisplay
-local blackDisplay
 
 -- Game state inputHandlers
 local gameController
@@ -34,11 +31,11 @@ function setupUI()
 	local whitePieceImage = pieceTable[1]
 	local blackPieceImage = pieceTable[7]
 	
-	whiteDisplay = PlayerDisplay('LIGHT', whitePieceImage)
+	local whiteDisplay = PlayerDisplay('LIGHT', whitePieceImage)
 	whiteDisplay:add()
 	whiteDisplay:moveTo(10,15)
 	
-	blackDisplay = PlayerDisplay('DARK', blackPieceImage)
+	local blackDisplay = PlayerDisplay('DARK', blackPieceImage)
 	blackDisplay:add()
 	blackDisplay:moveTo(320,15)
 	
@@ -65,7 +62,8 @@ function setupUI()
 	
 	board:moveTo(screenWidth / 2, screenHeight / 2)	
 	board:add()	
-	board:addCursor()
+	
+	return board, whiteDisplay, blackDisplay
 end
 
 -- Resets the game internals
@@ -129,7 +127,7 @@ function runGame()
 	playdate.setMinimumGCTime(5)		
 	math.randomseed(playdate.getSecondsSinceEpoch())
 	
-	setupUI()
+	local board, whiteDisplay, blackDisplay = setupUI()
 	
 	gameController = GameController(board, whiteDisplay, blackDisplay)
 	gameController.whitePlayer = HumanPlayer(gameController, WHITE)

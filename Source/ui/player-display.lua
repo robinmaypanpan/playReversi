@@ -7,8 +7,8 @@ class('PlayerDisplay').extends(gfx.sprite)
 
 local width = 70
 local height = 200
-local font = gfx.font.new('assets/fonts/Bubble-Time')
-local numberFont = gfx.font.new('assets/fonts/Bubble-Time')
+local font = gfx.font.new('assets/fonts/Picory')
+local numberFont = gfx.font.new('assets/fonts/Picory')
 
 function PlayerDisplay:init(name, pieceImage)
 	PlayerDisplay.super.init(self)
@@ -42,6 +42,7 @@ function PlayerDisplay:drawDisplay()
 		gfx.setFont(font)
 		gfx.drawTextAligned(self.name, width / 2,8,kTextAlignment.center)
 		
+		gfx.setFont(numberFont)
 		gfx.drawTextAligned(self.score, width / 2,55,kTextAlignment.center)
 		
 		-- Last, the player indicator

@@ -5,8 +5,10 @@ import 'players/base-ai'
 class('RandomAi').extends(BaseAi)
 
 function RandomAi:init(gameController, myColor)
-	RandomAi.super.init(self, gameController, myColor)
+	RandomAi.super.init(self, gameController, myColor)	
+	self.name = 'Easy AI'
 end
+
 
 -- Returns the move this AI wants to play
 function RandomAi:thinkAboutMove()

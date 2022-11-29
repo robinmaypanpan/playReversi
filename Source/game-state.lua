@@ -7,8 +7,6 @@ import 'lib/list'
 
 class('GameState').extends()
 
-local THINK_TIME = 20
-
 -- Global constants anyone can use
 NUM_BOARD_SPACES = 8
 WHITE = 1
@@ -98,8 +96,10 @@ function GameState:init(copyState)
 		self.validMoveQueue = List.new()
 		self.numValidMoves = 0
 		List.forEach(copyState.validMoves, function(move)			
+			assert(move ~= nil)		
 			List.pushEnd(self.validMoves, move)
-			self.numValidMoves += 1			
+			List.pushEnd(self.validMoveQueue, move)
+			self.numValidMoves += 1
 		end)
 		
 	else		
@@ -244,6 +244,7 @@ function GameState:isValidMove(location)
 	assert(location~=nil)
 	
 	return List.check(self.validMoves, function(validMove)
+		assert(validMove ~= nil)
 		return validMove.x == location.x and validMove.y == location.y
 	end)
 end

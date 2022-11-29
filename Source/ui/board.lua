@@ -50,6 +50,22 @@ function Board:createBoardData()
 	end
 end
 
+-- Load the indicated game state onto the board. Used for loading from disk
+function Board:loadState(gameState)
+	local board = gameState.board
+	-- We need to remove any pieces from the board to start
+	self:clearBoard()
+	
+	-- Now populate the board with pieces
+	for i=1,NUM_BOARD_SPACES do
+		for j=1,NUM_BOARD_SPACES do
+			if (board[i][j] ~= nils) then
+				self:addPiece(Location.new(i,j), board[i][j])
+			end
+		end
+	end
+end
+
 -- Draws the basic board image and returns that image
 function Board:drawBoard()
 	local boardImage = gfx.image.new(BOARD_SIZE+10, BOARD_SIZE+10)

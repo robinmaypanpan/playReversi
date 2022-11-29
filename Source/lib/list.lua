@@ -3,7 +3,7 @@ List = {}
 
 -- Creates a new list
 function List.new ()
-  return {first = 0, last = -1, length=0}
+  return {first = 1, last = 0, length=0}
 end
 
 -- Adds an element to the front of the list

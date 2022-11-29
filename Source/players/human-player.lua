@@ -14,7 +14,9 @@ class('HumanPlayer').extends(Player)
 
 function HumanPlayer:init(gameController, myColor)
 	HumanPlayer.super.init(self, gameController, myColor)
+	self.name = 'Human'
 end
+
 
 function HumanPlayer:moveDown()	
 	playdate.timer.performAfterDelay(1, function()

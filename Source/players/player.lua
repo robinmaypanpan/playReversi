@@ -11,7 +11,9 @@ function Player:init(gameController, myColor)
 	assert(myColor ~= nil)
 	self.gameController = gameController
 	self.myColor = myColor
+	self.name = 'BasePlayer'
 end
+
 
 -- Called to tell this player to take their turn
 function Player:takeTurn()		

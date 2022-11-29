@@ -72,6 +72,33 @@ function GameController:restartGame()
 	self:notifyPlayerTurn()
 end
 
+-- Save the current state of the game to disk
+function GameController:saveGame()
+	
+	local toSave = {
+		whitePlayer = self.whitePlayer.name,
+		blackPlayer = self.blackPlayer.name,
+		gameState = self.gameState
+	}
+	
+	playdate.datastore.write(toSave)
+end
+
+-- Attempt to load the game
+function GameController:loadState(gameStateData)
+	self.gameState = GameState(gameStateData)
+	local gameState = self.gameState
+	
+	self.board:setCursorPosition(self.gameState.validMoves[1])
+	
+	self.board:loadState(gameState)
+	
+	self.whiteDisplay:setScore(gameState.numWhitePieces)
+	self.blackDisplay:setScore(gameState.numBlackPieces)
+	self.whiteDisplay:setActive(gameState.currentPlayer == WHITE)
+	self.blackDisplay:setActive(gameState.currentPlayer == BLACK)	
+end
+
 -- Shows the game over display
 function GameController:showGameOver(endGameState)	
 	if (endGameState.numWhitePieces > endGameState.numBlackPieces) then			
@@ -96,6 +123,9 @@ function GameController:showGameOver(endGameState)
 		end
 	}
 	playdate.inputHandlers.push(playerInputHandlers)
+	
+	-- Remove the datastore since we don't care about this anymore
+	playdate.datastore.delete()
 end
 
 function GameController:makeMove(location)	
@@ -109,8 +139,6 @@ function GameController:makeMove(location)
 	-- Get the game state that corresponds to the new move
 	local newGameState = stateGenerator:makeMove(self.gameState, location)
 	self.gameState = newGameState
-	
-	board:validateGameState(newGameState)
 	
 	self.whiteDisplay:setScore(newGameState.numWhitePieces)
 	self.blackDisplay:setScore(newGameState.numBlackPieces)

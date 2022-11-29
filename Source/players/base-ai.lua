@@ -11,7 +11,8 @@ class('BaseAi').extends(Player)
 
 function BaseAi:init(gameController, myColor)
 	BaseAi.super.init(self, gameController, myColor)
-	self.stateGenerator = stateGenerator
+	self.stateGenerator = stateGenerator		
+	self.name = 'Base AI'
 end
 
 function BaseAi:chooseMove()

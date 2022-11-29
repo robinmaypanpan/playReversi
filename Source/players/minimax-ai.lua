@@ -20,7 +20,9 @@ function MinimaxAi:init(gameController, myColor)
 		cornerPieceBonus = 30, -- In addition to just having the piece out there
 		edgePieceBonus = 2 -- In addition to the edge piece
 	}
+	self.name = 'Hard AI'
 end
+
 
 -- Returns the move this AI wants to play
 function MinimaxAi:thinkAboutMove()		

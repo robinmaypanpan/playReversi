@@ -22,7 +22,7 @@ local audio = pulp.audio
 -- Game state inputHandlers
 local gameController
 
-local showDebugElements = false
+local showDebugElements = fals
 
 -- Sets up the display of the game
 function setupUI()
@@ -82,21 +82,24 @@ local playerOptions = {
 	'Hard AI'
 }
 
+-- Returns a created player object for the indicated color
+function getPlayer(playerString, gameController, color)
+	if (playerString == 'Human') then
+		return HumanPlayer(gameController, color)
+	elseif (playerString == 'Easy AI') then
+		return RandomAi(gameController, color)
+	elseif (playerString == 'Hard AI') then
+		return MinimaxAi(gameController, color)
+	else
+		error('No Player returned')
+	end
+end
+
 -- Change the white player and restart
 function changeWhitePlayer(newPlayerString)
 	gameController.whitePlayer:shutDown()
 	
-	local newPlayer
-	if (newPlayerString == 'Human') then
-		newPlayer = HumanPlayer(gameController, WHITE)
-	elseif (newPlayerString == 'Easy AI') then
-		newPlayer = RandomAi(gameController, WHITE)
-	elseif (newPlayerString == 'Hard AI') then
-		newPlayer = MinimaxAi(gameController, WHITE)
-	else
-		error('No Player returned')
-	end
-	
+	local newPlayer = getPlayer(newPlayerString, gameController, WHITE)	
 	gameController.whitePlayer = newPlayer
 	gameController:restartGame()
 end
@@ -105,17 +108,7 @@ end
 function changeBlackPlayer(newPlayerString)
 	gameController.blackPlayer:shutDown()
 	
-	local newPlayer
-	if (newPlayerString == 'Human') then
-		newPlayer = HumanPlayer(gameController, BLACK)
-	elseif (newPlayerString == 'Easy AI') then
-		newPlayer = RandomAi(gameController, BLACK)
-	elseif (newPlayerString == 'Hard AI') then
-		newPlayer = MinimaxAi(gameController, BLACK)
-	else
-		error('No Player returned')	
-	end
-	
+	local newPlayer = getPlayer(newPlayerString, gameController, BLACK)	
 	gameController.blackPlayer = newPlayer
 	gameController:restartGame()
 end
@@ -130,15 +123,26 @@ function runGame()
 	local board, whiteDisplay, blackDisplay = setupUI()
 	
 	gameController = GameController(board, whiteDisplay, blackDisplay)
-	gameController.whitePlayer = HumanPlayer(gameController, WHITE)
-	gameController.blackPlayer = MinimaxAi(gameController, BLACK)
+	
+	local loadedData = playdate.datastore.read()
+	if (loadedData) then
+		-- Load state from disk		
+		gameController.whitePlayer = getPlayer(loadedData.whitePlayer, gameController, WHITE)
+		gameController.blackPlayer = getPlayer(loadedData.blackPlayer, gameController, BLACK)
+		
+		gameController:loadState(loadedData.gameState)
+	else
+		gameController.whitePlayer = HumanPlayer(gameController, WHITE)
+		gameController.blackPlayer = MinimaxAi(gameController, BLACK)
+	end
 	
 	stateGenerator = StateGenerator(gameController.gameState)
 	
 	-- Update the system menu with our options
-	playdate:getSystemMenu():addMenuItem('Restart Game', restartGame)
-	playdate:getSystemMenu():addOptionsMenuItem('White', playerOptions,'Human', changeWhitePlayer)
-	playdate:getSystemMenu():addOptionsMenuItem('Black', playerOptions, 'Hard AI', changeBlackPlayer)
+	local systemMenu = playdate:getSystemMenu()
+	systemMenu:addMenuItem('Restart Game', restartGame)
+	systemMenu:addOptionsMenuItem('White', playerOptions,gameController.whitePlayer.name, changeWhitePlayer)
+	systemMenu:addOptionsMenuItem('Black', playerOptions, gameController.blackPlayer.name, changeBlackPlayer)
 	
 	-- Standard main game loop
 	function playdate.update()
@@ -152,6 +156,14 @@ function runGame()
 			playdate.drawFPS(10, 220)
 			playdate.graphics.drawTextAligned(stateGenerator.depth .. '-' .. stateGenerator.treeSize, playdate.display.getWidth() - 20, 220, kTextAlignment.right)
 		end
+	end
+	
+	function playdate.gameWillTerminate()
+		gameController:saveGame()
+	end
+	
+	function playdate.deviceWillSleep()
+		gameController:saveGame()
 	end
 		
 	gameController:startGame()

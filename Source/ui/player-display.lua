@@ -18,6 +18,18 @@ function PlayerDisplay:init(name, pieceImage)
 	self.pieceImage = pieceImage
 	self:setImage(self:drawDisplay())
 	self:setCenter(0,0)
+		
+	self.waitSprite = AnimatedSprite.new(gfx.imagetable.new('assets/images/hourglass'))
+	self.waitSprite:addState('idle', 1, 6, {loop = true, tickStep=8}, true)
+	self.waitSprite:setZIndex(20)
+	self.waitSprite:add()
+end
+
+function PlayerDisplay:moveTo(x, y)
+	PlayerDisplay.super.moveTo(self, x, y)	
+	if (self.waitSprite) then
+		self.waitSprite:moveTo(x + 35, y + height - 85)	
+	end
 end
 
 function PlayerDisplay:setScore(newScore)
@@ -58,5 +70,13 @@ end
 function PlayerDisplay:setActive(isActive)
 	self.isActive = isActive
 	self:setImage(self:drawDisplay())
+end
+
+function PlayerDisplay:setIsReady(isReady)
+	if (isReady == false) then
+		print ('Not ready!')
+	end
+	local visibility = not isReady
+	self.waitSprite:setVisible(visibility)
 end
 

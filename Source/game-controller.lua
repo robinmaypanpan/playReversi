@@ -193,3 +193,14 @@ end
 function GameController:startGame()
 	self:notifyPlayerTurn()
 end
+
+-- Should be called on update
+function GameController:update()
+	if (self.gameState.currentPlayer == WHITE) then
+		self.whiteDisplay:setIsReady(self.whitePlayer:isReady())
+		self.blackDisplay:setIsReady(true)
+	else
+		self.whiteDisplay:setIsReady(true)
+		self.blackDisplay:setIsReady(self.blackPlayer:isReady())		
+	end
+end

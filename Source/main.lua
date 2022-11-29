@@ -150,6 +150,7 @@ function runGame()
 		gfx.sprite.update()
 		audio.update() 
 		playdate.timer.updateTimers()
+		gameController:update()
 		stateGenerator:update()
 		
 		if (showDebugElements) then

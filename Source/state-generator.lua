@@ -23,6 +23,7 @@ function StateGenerator:init(initialGameState)
 	self.tree[initialGameState] = {}
 	self.treeTop = initialGameState
 	self.treeSize = 1
+	self.depth = 1
 	
 	List.pushEnd(self.queue, initialGameState)
 end
@@ -91,6 +92,7 @@ function StateGenerator:reset(newInitialGameState)
 	self.tree[newInitialGameState] = {}
 	self.treeTop = newInitialGameState
 	self.treeSize = 1
+	self.depth = 1
 	
 	List.pushEnd(self.queue, newInitialGameState)
 end

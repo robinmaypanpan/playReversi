@@ -122,3 +122,7 @@ function HumanPlayer:isReady()
 	-- The human player can immediately move around, but cannot select right away
 	return true
 end
+
+function HumanPlayer:canFullyMove()
+	return stateGenerator.depth > 2
+end

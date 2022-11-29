@@ -73,9 +73,6 @@ function PlayerDisplay:setActive(isActive)
 end
 
 function PlayerDisplay:setIsReady(isReady)
-	if (isReady == false) then
-		print ('Not ready!')
-	end
 	local visibility = not isReady
 	self.waitSprite:setVisible(visibility)
 end

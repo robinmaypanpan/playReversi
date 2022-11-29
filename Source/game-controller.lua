@@ -178,6 +178,7 @@ end
 
 -- When called, notifies the current player that it is their turn
 function GameController:notifyPlayerTurn()
+	self.checkReady = true
 	if (self.gameState.currentPlayer == WHITE) then
 		playdate.timer.performAfterDelay(10, function()
 			self.whitePlayer:takeTurn()
@@ -196,11 +197,19 @@ end
 
 -- Should be called on update
 function GameController:update()
-	if (self.gameState.currentPlayer == WHITE) then
-		self.whiteDisplay:setIsReady(self.whitePlayer:isReady())
-		self.blackDisplay:setIsReady(true)
-	else
-		self.whiteDisplay:setIsReady(true)
-		self.blackDisplay:setIsReady(self.blackPlayer:isReady())		
+	if (self.checkReady) then
+		if (self.gameState.currentPlayer == WHITE) then
+			local whiteCanMove = self.whitePlayer:canFullyMove()
+			self.checkReady = not whiteCanMove
+			self.whiteDisplay:setIsReady(whiteCanMove)
+			
+			self.blackDisplay:setIsReady(true)
+		else
+			self.whiteDisplay:setIsReady(true)		
+				
+			local blackCanMove = self.blackPlayer:canFullyMove()
+			self.checkReady = not blackCanMove
+			self.blackDisplay:setIsReady(blackCanMove)
+		end
 	end
 end

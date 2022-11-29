@@ -40,3 +40,8 @@ end
 function Player:isReady()
 	return stateGenerator.depth > 2
 end
+
+-- The same as is ready for most situations, used to show the hourglass or not
+function Player:canFullyMove()
+	return self:isReady()
+end

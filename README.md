@@ -10,8 +10,8 @@ The game will be available on itch.io for download, or you can download it here 
 
 ## Credits
 
-[LuaUnit](https://github.com/bluebird75/luaunit), used for testing and validating the game state
-[Chevy Ray's Pixel Fonts](https://chevyray.itch.io/pixel-fonts) - Used for scoring and logo
-[Pulp Audio Engine](https://play.date/pulp/) - Used to create synthesized sound effects on board the unit
-[Lua Performant List](https://www.lua.org/pil/11.4.html) - List implementation from the Lua reference manual
-[Animated Sprite](https://github.com/Whitebrim/AnimatedSprite) - Useful library for animated sprites!
+- [LuaUnit](https://github.com/bluebird75/luaunit), used for testing and validating the game state
+- [Chevy Ray's Pixel Fonts](https://chevyray.itch.io/pixel-fonts) - Used for scoring and logo
+- [Pulp Audio Engine](https://play.date/pulp/) - Used to create synthesized sound effects on board the unit
+- [Lua Performant List](https://www.lua.org/pil/11.4.html) - List implementation from the Lua reference manual
+- [Animated Sprite](https://github.com/Whitebrim/AnimatedSprite) - Useful library for animated sprites!

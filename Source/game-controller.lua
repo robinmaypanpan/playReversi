@@ -177,17 +177,20 @@ function GameController:moveCursorTo(newPosition)
 end
 
 -- When called, notifies the current player that it is their turn
-function GameController:notifyPlayerTurn()
-	self.checkReady = true
+function GameController:notifyPlayerTurn()	
+	local nextPlayer
 	if (self.gameState.currentPlayer == WHITE) then
-		playdate.timer.performAfterDelay(10, function()
-			self.whitePlayer:takeTurn()
-		end)
+		nextPlayer = self.whitePlayer
 	else
-		playdate.timer.performAfterDelay(10, function()
-			self.blackPlayer:takeTurn()
-		end)
+		nextPlayer = self.blackPlayer
 	end
+	
+	playdate.timer.performAfterDelay(10, function()
+		nextPlayer:takeTurn()
+		playdate.timer.performAfterDelay(150, function()
+			self.checkReady = true
+		end)
+	end)
 end
 
 -- When called, starts the game by telling the current player to take their turn

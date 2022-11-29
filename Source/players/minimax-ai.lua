@@ -156,3 +156,7 @@ end
 function MinimaxAi:isReady()
 	return stateGenerator.depth > MAX_DEPTH
 end
+
+function MinimaxAi:canFullyMove()
+	return stateGenerator.depth > MAX_DEPTH and not self.thinking
+end

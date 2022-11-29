@@ -13,12 +13,19 @@ function BaseAi:init(gameController, myColor)
 	BaseAi.super.init(self, gameController, myColor)
 	self.stateGenerator = stateGenerator		
 	self.name = 'Base AI'
+	self.thinking = false
+end
+
+function BaseAi:takeTurn()
+	self.thinking = true
+	BaseAi.super.takeTurn(self)
 end
 
 function BaseAi:chooseMove()
 	local gameController = self.gameController
 		
 	local function onComplete(chosenMove)
+		self.thinking = false
 		playdate.timer.performAfterDelay(500, function() 
 			gameController:moveCursorTo(chosenMove) 
 			playdate.timer.performAfterDelay(200, function()

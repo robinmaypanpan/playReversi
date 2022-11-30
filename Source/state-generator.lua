@@ -69,7 +69,7 @@ end
 -- Virtually executes this move by resetting the root and returning the new state
 function StateGenerator:makeMove(gameState, move)
 	assert(gameState == self.treeTop)
-	assert(self.tree[gameState][hashMove(move)] ~= null)
+	assert(self.tree[gameState][hashMove(move)] ~= nil)
 	
 	local newGameState = self.tree[gameState][hashMove(move)]
 	self:setNewRoot(gameState, move)

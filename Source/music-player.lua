@@ -1,5 +1,11 @@
 music = {}
 
+
+-- settings
+local repeatCount = 2
+local silenceDelay = 5000
+
+-- data
 local playlist = {
 	'assets/audio/flipflop',
 	'assets/audio/flipflop',
@@ -8,9 +14,9 @@ local playlist = {
 }
 
 local playlistIndex = 1
-local repeatCount = 2
 
 local musicPlayer
+
 
 local function randomizeTable( t )
 	-- randomize the item orders of the table t
@@ -38,7 +44,9 @@ function music.init()
 		local nextSong = playlist[playlistIndex]
 		
 		musicPlayer:load(playlist[playlistIndex])
-		musicPlayer:play(repeatCount)
+		playdate.timer.performAfterDelay(silenceDelay, function()			
+			musicPlayer:play(repeatCount)
+		end)
 	end)
 end
 

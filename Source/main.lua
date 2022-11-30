@@ -14,6 +14,7 @@ import 'players/minimax-ai'
 
 import 'game-controller'
 import 'state-generator'
+import 'music-player'
 
 -- Save typing!
 local gfx = playdate.graphics
@@ -116,6 +117,9 @@ end
 -- Runs the game
 function runGame()
 	audio.init('assets/audio/pulp-songs.json', 'assets/audio/pulp-sounds.json')
+	
+	music.init()
+	music.play()
 	
 	playdate.setMinimumGCTime(5)		
 	math.randomseed(playdate.getSecondsSinceEpoch())

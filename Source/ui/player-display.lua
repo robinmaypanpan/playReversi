@@ -8,7 +8,7 @@ class('PlayerDisplay').extends(gfx.sprite)
 local width = 70
 local height = 200
 local font = gfx.font.new('assets/fonts/Picory')
-local numberFont = gfx.font.new('assets/fonts/Picory')
+local numberFont = gfx.font.new('assets/fonts/Bubble-Time-35')
 
 function PlayerDisplay:init(name, pieceImage)
 	PlayerDisplay.super.init(self)
@@ -28,7 +28,7 @@ end
 function PlayerDisplay:moveTo(x, y)
 	PlayerDisplay.super.moveTo(self, x, y)	
 	if (self.waitSprite) then
-		self.waitSprite:moveTo(x + 35, y + height - 85)	
+		self.waitSprite:moveTo(x + 35, y + height - 80)	
 	end
 end
 

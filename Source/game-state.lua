@@ -60,7 +60,6 @@ function GameState:init(copyState)
 			for col = 1,NUM_BOARD_SPACES do
 				local copyValue = copyState.boardGrid:get(row, col)
 				self.boardGrid:set(row, col, copyValue)
-				assert(self.boardGrid:get(row,col) == copyValue)
 			end
 		end
 		

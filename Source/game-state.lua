@@ -140,6 +140,15 @@ function GameState:updateValidMoves()
 			end
 		end
 	end
+	
+	local newValidMoves = flipflop.generateValidMoves(self.boardGrid, self.currentPlayer)	
+	local newNumValidMoves = newValidMoves:getSize()
+	local newValidMoveList = List.new()
+	local row, col
+	repeat
+		row, col = newValidMoves:pop()
+		List.pushEnd(newValidMoveList, Location.new(row, col))
+	until row == nil and col == nil
 end
 
 -- Add a piece of the current player at the indicated location

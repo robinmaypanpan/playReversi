@@ -1,6 +1,13 @@
 
 #include "grid.h"
 
+int getValueAt(Grid* grid, int row, int col) 
+{	
+	int realPosition = (row - 1) * grid->numCols + (col - 1);
+	
+	return grid->data[realPosition];
+}
+
 static PlaydateAPI* pd = NULL;
 
 static int grid_newobject(lua_State* L)
@@ -41,9 +48,7 @@ static int grid_get(lua_State* L)
 	int row = pd->lua->getArgInt(2);
 	int col = pd->lua->getArgInt(3);
 	
-	int realPosition = (row - 1) * grid->numCols + (col - 1);
-	
-	pd->lua->pushInt(grid->data[realPosition]);
+	pd->lua->pushInt(getValueAt(grid, row, col));
 	
 	return 1;
 }

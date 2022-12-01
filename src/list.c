@@ -85,8 +85,14 @@ static int list_pop(lua_State* L)
 	
 	ListNode* node = popNode(list);
 	
-	pd->lua->pushInt(node->row);
-	pd->lua->pushInt(node->col);
+	if (node != NULL) {
+		pd->lua->pushNil();
+		pd->lua->pushNil();
+	} else {		
+		pd->lua->pushInt(node->row);
+		pd->lua->pushInt(node->col);
+	}
+	
 	return 2;
 }
 
@@ -105,8 +111,6 @@ static int list_push(lua_State* L)
 static int list_getsize(lua_State* L)
 {	
 	List* list = pd->lua->getArgObject(1, "pointlist", NULL);
-	
-	ListNode* node = popNode(list);
 	
 	pd->lua->pushInt(list->size);
 	return 1;

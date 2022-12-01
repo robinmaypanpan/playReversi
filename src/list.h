@@ -18,6 +18,10 @@ typedef struct
 	ListNode* tail;
 } List;
 
+ListNode* popNode(List* list);
+void pushNode(List* list, ListNode* node);
+ListNode* createNode(int row, int col);
+
 void registerList(PlaydateAPI* playdate);
 
 #endif /* list_h */

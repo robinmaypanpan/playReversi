@@ -12,5 +12,6 @@ typedef struct
 } Grid;
 
 void registerGrid(PlaydateAPI* playdate);
+int getValueAt(Grid* grid, int row, int col);
 
 #endif /* grid_h */

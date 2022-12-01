@@ -41,10 +41,19 @@ static int generateValidMoves(lua_State* L)
 	int currentPlayerColor = pd->lua->getArgInt(2);
 	
 	List* list = pd->system->realloc(NULL, sizeof(List));
+	list->size = 0;
+	list->head = NULL;
+	list->tail = NULL;
+		
+	pd->system->logToConsole("Found %d at 4,5", getValueAt(board, 4, 5));
 	
 	// Let's get to work!
 	
+	ListNode* newNode = createNode(4, 5);
+	pushNode(list, newNode);
 	
+	pd->system->logToConsole("Returning list of size %d", list->size);
+		
 	pd->lua->pushObject(list, "pointlist", 0);
 	
 	return 1;

@@ -7,11 +7,11 @@ ListNode* popNode(List* list)
 {
 	ListNode* oldTail = list->tail;
 	if (oldTail != NULL) {
-		if (list->head == oldTail) {
+		if (list->head == list->tail) {
 			// This is our only node.
 			list->head = NULL;
 			list->tail = NULL;
-			list->size = 0;			
+			list->size = 0;
 		} else {			
 			list->tail = oldTail->prev;
 			list->tail->next = NULL;
@@ -85,7 +85,7 @@ static int list_pop(lua_State* L)
 	
 	ListNode* node = popNode(list);
 	
-	if (node != NULL) {
+	if (node == NULL) {
 		pd->lua->pushNil();
 		pd->lua->pushNil();
 	} else {		

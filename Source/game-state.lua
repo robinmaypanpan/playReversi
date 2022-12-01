@@ -127,27 +127,19 @@ end
 
 -- Updates the array of all valid places to move
 function GameState:updateValidMoves()
+	local newValidMoves = flipflop.generateValidMoves(self.boardGrid, self.currentPlayer)	
+	self.numValidMoves = newValidMoves:getSize()
+	
 	self.validMoves = List.new()
 	self.validMoveQueue = List.new()
-	self.numValidMoves = 0
-	for i=1,NUM_BOARD_SPACES do
-		for j=1,NUM_BOARD_SPACES do
-			local testPoint = Location.new(i,j)
-			if (self:calculateIfValidMove(testPoint)) then
-				List.pushEnd(self.validMoves, testPoint)
-				List.pushEnd(self.validMoveQueue, testPoint)
-				self.numValidMoves+=1
-			end
-		end
-	end
 	
-	local newValidMoves = flipflop.generateValidMoves(self.boardGrid, self.currentPlayer)	
-	local newNumValidMoves = newValidMoves:getSize()
-	local newValidMoveList = List.new()
-	local row, col
 	while(newValidMoves:getSize() > 0) do
-		row, col = newValidMoves:pop()
-		List.pushEnd(newValidMoveList, Location.new(row, col))
+		local row, col = newValidMoves:pop()
+		assert(row ~= nil)
+		assert(col ~= nil)
+		local testPoint = Location.new(row, col);
+		List.pushEnd(self.validMoves, testPoint)
+		List.pushEnd(self.validMoveQueue, testPoint)
 	end
 end
 
@@ -160,19 +152,6 @@ function GameState:addCurrentPlayerPieceAt(location)
 	else
 		self.numBlackPieces += 1
 	end
-end
-
--- Flip the piece at the indicated location
-function GameState:flipPieceToCurrentPlayerAt(location)
-	local row, col = Location.unpack(location)
-	self.boardGrid:set(row, col, self.currentPlayer)
-	if (self.currentPlayer == WHITE) then
-		self.numWhitePieces += 1
-		self.numBlackPieces -= 1
-	else
-		self.numBlackPieces += 1
-		self.numWhitePieces -= 1
-	end	
 end
 
 -- Returns true if we can flip all the pieces in the direction from the location in that direction
@@ -208,6 +187,19 @@ function GameState:checkDirectionForMove(location, direction)
 	return false
 end
 
+-- Flip the piece at the indicated location
+function GameState:flipPieceToCurrentPlayerAt(location)
+	local row, col = Location.unpack(location)
+	self.boardGrid:set(row, col, self.currentPlayer)
+	if (self.currentPlayer == WHITE) then
+		self.numWhitePieces += 1
+		self.numBlackPieces -= 1
+	else
+		self.numBlackPieces += 1
+		self.numWhitePieces -= 1
+	end	
+end
+
 -- Flips all the pieces in the direction indicated so they match the endpoints
 function GameState:flipInDirection(location, direction) 
 	assert(location ~= nil)
@@ -238,27 +230,6 @@ function GameState:isValidMove(location)
 		assert(validMove ~= nil)
 		return validMove.x == location.x and validMove.y == location.y
 	end)
-end
-
--- Function that returns true if the current player can make this move
-function GameState:calculateIfValidMove(location)
-	assert(location ~= nil)
-	
-	local row,col = Location.unpack(location)
-	-- You can't move onto spaces that already have pieces
-	if (self.boardGrid:get(row, col) ~= EMPTY) then 
-		return false 
-	end	
-	
-	-- Look in every direction for a valid move
-	for _,direction in pairs(MOVE_DIRECTIONS) do
-		if (self:checkDirectionForMove(location, direction)) then
-			return true
-		end
-	end
-	
-	-- If we look in every direction and find nothing, we're hosed
-	return false	
 end
 
 -- Function to execute a move

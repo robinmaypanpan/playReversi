@@ -38,7 +38,7 @@ eventHandler(PlaydateAPI* playdate, PDSystemEvent event, uint32_t arg)
 
 static bool checkDirectionForMove(Grid* board, int row, int col, int dRow, int dCol, int currentPlayer)
 {
-	pd->system->logToConsole("checkDirectionForMove at %d,%d, direction %d,%d", row, col, dRow, dCol);
+	// pd->system->logToConsole("checkDirectionForMove at %d,%d, direction %d,%d", row, col, dRow, dCol);
 	
 	// We don't check our home square.
 	if (dRow == 0 && dCol == 0) {
@@ -64,10 +64,10 @@ static bool checkDirectionForMove(Grid* board, int row, int col, int dRow, int d
 
 static bool calculateIfValidMove(Grid* board, int row, int col, int currentPlayer)
 {
-	pd->system->logToConsole("calculateIfValidMove at %d,%d", row, col);
+	// pd->system->logToConsole("calculateIfValidMove at %d,%d", row, col);
 		
 	// You can't move onto spaces that already have pieces
-	if (getValueAt(board, row, col) == 0) {
+	if (getValueAt(board, row, col) != 0) {
 		return false;
 	}
 	
@@ -97,14 +97,14 @@ static int generateValidMoves(lua_State* L)
 	for (int row = 1; row <= board->numRows; row ++) {
 		for (int col = 1; col <= board->numCols; col++) {	
 			if (calculateIfValidMove(board, row, col, currentPlayerColor)) {	
-				pd->system->logToConsole("Found valid move at %d,%d", row, col);
+				// pd->system->logToConsole("Found valid move at %d,%d", row, col);
 				ListNode* newNode = createNode(row, col);
 				pushNode(list, newNode);
 			}		
 		}
 	}
 	
-	pd->system->logToConsole("Returning list of size %d", list->size);
+	// pd->system->logToConsole("Returning list of size %d", list->size);
 		
 	pd->lua->pushObject(list, "pointlist", 0);
 	

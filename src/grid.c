@@ -3,6 +3,10 @@
 
 int getValueAt(Grid* grid, int row, int col) 
 {	
+	if (row < 1 || row > grid->numRows || col < 1 || col > grid->numCols) {
+		return -1;
+	}
+	
 	int realPosition = (row - 1) * grid->numCols + (col - 1);
 	
 	return grid->data[realPosition];

@@ -145,10 +145,10 @@ function GameState:updateValidMoves()
 	local newNumValidMoves = newValidMoves:getSize()
 	local newValidMoveList = List.new()
 	local row, col
-	repeat
+	while(newValidMoves:getSize() > 0) do
 		row, col = newValidMoves:pop()
 		List.pushEnd(newValidMoveList, Location.new(row, col))
-	until row == nil and col == nil
+	end
 end
 
 -- Add a piece of the current player at the indicated location

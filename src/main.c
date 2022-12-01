@@ -4,6 +4,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdbool.h>
 
 #include "pd_api.h"
 #include "grid.h"
@@ -35,6 +36,54 @@ eventHandler(PlaydateAPI* playdate, PDSystemEvent event, uint32_t arg)
 	return 0;
 }
 
+static bool checkDirectionForMove(Grid* board, int row, int col, int dRow, int dCol, int currentPlayer)
+{
+	pd->system->logToConsole("checkDirectionForMove at %d,%d, direction %d,%d", row, col, dRow, dCol);
+	
+	// We don't check our home square.
+	if (dRow == 0 && dCol == 0) {
+		return false;
+	}
+	
+	bool foundAnOpponentPiece = false;
+	int nextRow = row + dRow;
+	int nextCol = col + dCol;
+	int piece = getValueAt(board, nextRow, nextCol);
+	int nonCurrentPlayer = currentPlayer == 1 ? 2 : 1;
+	
+	while (piece == nonCurrentPlayer) {
+		foundAnOpponentPiece = true;
+		
+		nextRow = nextRow + dRow;
+		nextCol = nextCol + dCol;
+		piece = getValueAt(board, nextRow, nextCol);		
+	}
+	
+	return (foundAnOpponentPiece && piece == currentPlayer);
+}
+
+static bool calculateIfValidMove(Grid* board, int row, int col, int currentPlayer)
+{
+	pd->system->logToConsole("calculateIfValidMove at %d,%d", row, col);
+		
+	// You can't move onto spaces that already have pieces
+	if (getValueAt(board, row, col) == 0) {
+		return false;
+	}
+	
+	// Look in every direction for a valid move
+	for (int dRow = -1; dRow <= 1; dRow ++) {
+		for (int dCol = -1; dCol <= 1; dCol++) {
+			if (checkDirectionForMove(board, row, col, dRow, dCol, currentPlayer)) 			{				
+				return true;
+			}
+		}
+	}
+	
+	// If we look in every direction and find nothing, we're hosed	
+	return false;
+}
+
 static int generateValidMoves(lua_State* L)
 {	
 	Grid* board = pd->lua->getArgObject(1, "intgrid", NULL);
@@ -44,13 +93,16 @@ static int generateValidMoves(lua_State* L)
 	list->size = 0;
 	list->head = NULL;
 	list->tail = NULL;
-		
-	pd->system->logToConsole("Found %d at 4,5", getValueAt(board, 4, 5));
 	
-	// Let's get to work!
-	
-	ListNode* newNode = createNode(4, 5);
-	pushNode(list, newNode);
+	for (int row = 1; row <= board->numRows; row ++) {
+		for (int col = 1; col <= board->numCols; col++) {	
+			if (calculateIfValidMove(board, row, col, currentPlayerColor)) {	
+				pd->system->logToConsole("Found valid move at %d,%d", row, col);
+				ListNode* newNode = createNode(row, col);
+				pushNode(list, newNode);
+			}		
+		}
+	}
 	
 	pd->system->logToConsole("Returning list of size %d", list->size);
 		

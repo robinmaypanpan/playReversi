@@ -20,12 +20,13 @@ function GameController:init(board, whiteDisplay, blackDisplay)
 	self.blackDisplay = blackDisplay
 	
 	self:initializeGameState()
+	local validMoves = self.gameState.validMoves
 	
-	assert(self.gameState.validMoves[1] ~= nil)
+	assert(validMoves[validMoves.first] ~= nil)
 	
 	-- Initialize the cursor to a valid move
-	self.board:setCursorPosition(self.gameState.validMoves[1])
-	self.board.cursor:setValidPosition(true)
+	board:setCursorPosition(validMoves[validMoves.first])
+	board.cursor:setValidPosition(true)
 end
 
 -- Initializes the game state by setting us back into the initial state of the game

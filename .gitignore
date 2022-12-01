@@ -1,1 +1,4 @@
 *.pdx*
+build/*
+Source/pdex.bin
+Source/pdex.dylib

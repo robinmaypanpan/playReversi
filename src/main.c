@@ -7,6 +7,7 @@
 
 #include "pd_api.h"
 #include "grid.h"
+#include "list.h"
 
 static PlaydateAPI* pd = NULL;
 static int generateValidMoves(lua_State* L);
@@ -22,6 +23,7 @@ eventHandler(PlaydateAPI* playdate, PDSystemEvent event, uint32_t arg)
 		pd = playdate;
 		
 		registerGrid(pd);
+		registerList(pd);
 		
 		const char* err;
 
@@ -38,7 +40,12 @@ static int generateValidMoves(lua_State* L)
 	Grid* board = pd->lua->getArgObject(1, "intgrid", NULL);
 	int currentPlayerColor = pd->lua->getArgInt(2);
 	
-	pd->system->logToConsole("I have %d color", currentPlayerColor);
+	List* list = pd->system->realloc(NULL, sizeof(List));
 	
-	return 0;
+	// Let's get to work!
+	
+	
+	pd->lua->pushObject(list, "pointlist", 0);
+	
+	return 1;
 }

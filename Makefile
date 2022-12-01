@@ -14,7 +14,7 @@ $(error SDK path not found; set ENV value PLAYDATE_SDK_PATH)
 endif
 
 # List C source files here
-SRC = src/main.c src/grid.c
+SRC = src/main.c src/grid.c src/list.c
 
 # List all user directories here
 UINCDIR = 

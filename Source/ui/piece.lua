@@ -11,7 +11,7 @@ function Piece:init(spaceSize, initialColor)
 	Piece.super.init(self, pieceImageTable)
 	
 	assert(spaceSize > 0)
-	assert(initialColor == 1 or initialColor == 0)
+	assert(initialColor == WHITE or initialColor == BLACK)
 	
 	self.pieceColor = initialColor
 	self.diameter = spaceSize - 5
@@ -19,10 +19,10 @@ function Piece:init(spaceSize, initialColor)
 	self:addState('black', 2, 7, {tickStep = 2, loop=false})
 	self:addState('white', 1, 6, {tickStep = 2, loop=false, reverse=true})
 	
-	if(initialColor == 0) then
+	if(initialColor == BLACK) then
 		self:changeState('black', false)
 		self:setImage(pieceImageTable[7])
-	else
+	elseif (initialColor == WHITE) then
 		self:changeState('white', false)
 		self:setImage(pieceImageTable[1])
 	end
@@ -30,9 +30,9 @@ end
 
 function Piece:flip()
 	self.pieceColor = invertColor(self.pieceColor)
-	if(self.pieceColor == 0) then
+	if(self.pieceColor == BLACK) then
 		self:changeState('black', true)
-	else
+	elseif (self.pieceColor == WHITE) then
 		self:changeState('white', true)
 	end
 	

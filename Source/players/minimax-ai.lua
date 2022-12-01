@@ -66,7 +66,7 @@ function MinimaxAi:minimax(gameState, depth)
 end
 
 function MinimaxAi:evaluateBoard(gameState)
-	local board = gameState.board
+	local boardGrid = gameState.boardGrid
 	local weights = self.weights
 	local myColor = self.myColor
 	local opponentColor = invertColor(myColor)
@@ -115,23 +115,23 @@ function MinimaxAi:evaluateBoard(gameState)
 	}
 	
 	for _,corner in pairs(corners) do
-		local cornerPiece = board[corner[1]][corner[2]]
+		local cornerPiece = boardGrid:get(corner[1], corner[2])
 		value += self:getValueDifference(cornerPiece, weights.cornerPieceBonus)
 	end
 	
 	-- Check the edges
 	for i = 2,NUM_BOARD_SPACES - 1 do
 		-- Left edge
-		local leftEdgePiece = board[i][1]
+		local leftEdgePiece = boardGrid:get(i, 1)
 		value += self:getValueDifference(leftEdgePiece, weights.edgePieceBonus)
 		
-		local topEdgePiece = board[1][i]
+		local topEdgePiece = boardGrid:get(1, i)
 		value += self:getValueDifference(topEdgePiece, weights.edgePieceBonus)
 		
-		local rightEdgePiece = board[i][NUM_BOARD_SPACES]
+		local rightEdgePiece = boardGrid:get(i, NUM_BOARD_SPACES)
 		value += self:getValueDifference(rightEdgePiece, weights.edgePieceBonus)
 		
-		local bottomEdgePiece = board[NUM_BOARD_SPACES][i]
+		local bottomEdgePiece = boardGrid:get(NUM_BOARD_SPACES, i)
 		value += self:getValueDifference(bottomEdgePiece, weights.edgePieceBonus)					
 	end
 	

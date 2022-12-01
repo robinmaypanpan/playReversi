@@ -15,6 +15,7 @@ The game will be available on itch.io for download, or you can download it here 
 - [Pulp Audio Engine](https://play.date/pulp/) - Used to create synthesized sound effects on board the unit
 - [Lua Performant List](https://www.lua.org/pil/11.4.html) - List implementation from the Lua reference manual
 - [Animated Sprite](https://github.com/Whitebrim/AnimatedSprite) - Useful library for animated sprites!
+- [Soundtrack by b.trx](https://b-trx.bandcamp.com) - Background soundtrack created by b.trx
 - Playtesters
 	- Astra Tanuki
 	- Blue Neustifter

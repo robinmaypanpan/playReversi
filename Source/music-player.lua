@@ -9,8 +9,7 @@ local silenceDelay = 5000
 local playlist = {
 	'assets/audio/flipflop',
 	'assets/audio/flipflop2',
-	'assets/audio/flipflop',
-	'assets/audio/flipflop2'
+	'assets/audio/121b',
 }
 
 local playlistIndex = 1

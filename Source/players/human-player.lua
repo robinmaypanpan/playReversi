@@ -47,7 +47,8 @@ function HumanPlayer:doMove(location)
 		-- We have enough states to do this	
 		self.gameController:makeMove(location)
 	else		
-		playdate.timer.performAfterDelay(200, function()
+		self.humanTimer = playdate.timer.performAfterDelay(200, function()
+			self.humanTimer = nil
 			self:doMove(location)
 		end)
 	end
@@ -115,6 +116,11 @@ function HumanPlayer:chooseMove()
 end
 
 function HumanPlayer:shutDown()
+	HumanPlayer.super.shutDown(self)
+	if (self.humanTimer) then
+		self.humanTimer:remove()
+		self.humanTimer = nil
+	end
 	playdate.inputHandlers.pop()
 end
 

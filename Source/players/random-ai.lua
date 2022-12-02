@@ -12,12 +12,12 @@ end
 
 -- Returns the move this AI wants to play
 function RandomAi:thinkAboutMove()
-	assert(self.gameController ~= nil)
 	local gameController = self.gameController
 	local gameState = gameController.gameState
+	local validMoves = gameState.validMoves
 		
-	local chosenMoveIndex = math.random(gameState.validMoves.first, gameState.validMoves.last)
-	local chosenMove = gameState.validMoves[chosenMoveIndex]
+	local chosenMoveIndex = math.random(validMoves.first, validMoves.last)
+	local chosenMove = validMoves[chosenMoveIndex]
 	
 	return chosenMove
 end

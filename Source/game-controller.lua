@@ -73,6 +73,17 @@ function GameController:restartGame()
 	self:notifyPlayerTurn()
 end
 
+-- Called to shutdown any pending timer actions
+function GameController:shutDown()
+	self.whitePlayer:shutDown()
+	self.blackPlayer:shutDown()
+	
+	if (self.turnTimer) then
+		self.turnTimer:remove()
+		self.turnTimer = nil
+	end
+end
+
 -- Save the current state of the game to disk
 function GameController:saveGame()
 	
@@ -186,9 +197,10 @@ function GameController:notifyPlayerTurn()
 		nextPlayer = self.blackPlayer
 	end
 	
-	playdate.timer.performAfterDelay(10, function()
+	self.turnTimer = playdate.timer.performAfterDelay(10, function()
 		nextPlayer:takeTurn()
-		playdate.timer.performAfterDelay(150, function()
+		self.turnTimer = playdate.timer.performAfterDelay(150, function()
+			self.turnTimer = nil
 			self.checkReady = true
 		end)
 	end)

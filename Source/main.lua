@@ -23,7 +23,7 @@ local audio = pulp.audio
 -- Game state inputHandlers
 local gameController
 
-local showDebugElements = true
+local showDebugElements = false
 
 -- Sets up the display of the game
 function setupUI()
@@ -98,7 +98,7 @@ end
 
 -- Change the white player and restart
 function changeWhitePlayer(newPlayerString)
-	gameController.whitePlayer:shutDown()
+	gameController:shutDown()
 	
 	local newPlayer = getPlayer(newPlayerString, gameController, WHITE)	
 	gameController.whitePlayer = newPlayer
@@ -107,7 +107,7 @@ end
 
 -- Change the black player and restart
 function changeBlackPlayer(newPlayerString)
-	gameController.blackPlayer:shutDown()
+	gameController:shutDown()
 	
 	local newPlayer = getPlayer(newPlayerString, gameController, BLACK)	
 	gameController.blackPlayer = newPlayer

@@ -4,7 +4,7 @@ import 'game-state'
 import 'lib/list'
 
 local MS_PER_FRAME <const> = 1000 // playdate.display.getRefreshRate()
-local TIME_LIMIT = 0.70 * MS_PER_FRAME
+local TIME_LIMIT = 0.65 * MS_PER_FRAME
 local MAX_DEPTH = 8
 local MAX_TREE_SIZE = 2500
 
@@ -67,10 +67,7 @@ function StateGenerator:setNewRoot(fromGameState, toMove)
 end
 
 -- Virtually executes this move by resetting the root and returning the new state
-function StateGenerator:makeMove(gameState, move)
-	assert(gameState == self.treeTop)
-	assert(self.tree[gameState][hashMove(move)] ~= nil)
-	
+function StateGenerator:makeMove(gameState, move)	
 	local newGameState = self.tree[gameState][hashMove(move)]
 	self:setNewRoot(gameState, move)
 	

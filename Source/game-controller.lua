@@ -90,7 +90,7 @@ function GameController:saveGame()
 	local toSave = {
 		whitePlayer = self.whitePlayer.name,
 		blackPlayer = self.blackPlayer.name,
-		gameState = self.gameState
+		gameState = self.gameState:exportState()
 	}
 	
 	playdate.datastore.write(toSave)
@@ -98,8 +98,9 @@ end
 
 -- Attempt to load the game
 function GameController:loadState(gameStateData)
-	self.gameState = GameState(gameStateData)
+	self.gameState = GameState()
 	local gameState = self.gameState
+	gameState:importState(gameStateData)
 	
 	self.board:setCursorPosition(self.gameState.validMoves[1])
 	

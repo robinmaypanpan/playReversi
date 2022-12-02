@@ -52,15 +52,16 @@ end
 
 -- Load the indicated game state onto the board. Used for loading from disk
 function Board:loadState(gameState)
-	local board = gameState.board
+	local boardGrid = gameState.boardGrid
 	-- We need to remove any pieces from the board to start
 	self:clearBoard()
 	
 	-- Now populate the board with pieces
 	for i=1,NUM_BOARD_SPACES do
 		for j=1,NUM_BOARD_SPACES do
-			if (board[i][j] ~= nils) then
-				self:addPiece(Location.new(i,j), board[i][j])
+			local piece = boardGrid:get(i,j)
+			if (piece ~= EMPTY) then
+				self:addPiece(Location.new(i,j), piece)
 			end
 		end
 	end

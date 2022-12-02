@@ -109,6 +109,67 @@ function GameState:init(copyState)
 	end
 end
 
+function GameState:exportState()
+	local gameStateData = {
+		numWhitePieces = self.numWhitePieces,
+		numBlackPieces = self.numBlackPieces,
+		state = self.state,
+		currentPlayer = self.currentPlayer,
+		numValidMoves = self.numValidMoves
+	}			
+	
+	-- Copy the values of the board over
+	local board = {}
+	for row = 1,NUM_BOARD_SPACES do
+		board[row] = {}
+		for col = 1,NUM_BOARD_SPACES do
+			board[row][col] = self.boardGrid:get(row, col)
+		end
+	end
+	
+	gameStateData.board = board
+	
+	return gameStateData
+end
+
+-- 
+function GameState:importState(gameStateData)	
+	if (gameStateData.board == nil) then
+		return false
+	end
+	
+		
+	self.state = gameStateData.state
+	self.currentPlayer = gameStateData.currentPlayer
+	self.nonCurrentPlayer = invertColor(gameStateData.currentPlayer)
+
+	local numWhitePieces = 0
+	local numBlackPieces = 0
+	
+	local board = gameStateData.board
+	for row = 1,NUM_BOARD_SPACES do
+		for col = 1,NUM_BOARD_SPACES do
+			local piece = board[row][col]
+			self.boardGrid:set(row, col, piece)
+			if (piece == WHITE) then
+				numWhitePieces += 1
+			elseif (piece == BLACK) then
+				numBlackPieces += 1
+			end
+		end
+	end
+	
+	assert(numWhitePieces == gameStateData.numWhitePieces)
+	assert(numBlackPieces == gameStateData.numBlackPieces)
+	
+	self.numWhitePieces = numWhitePieces
+	self.numBlackPieces = numBlackPieces
+	
+	self:updateValidMoves()
+	
+	assert(self.numValidMoves == gameStateData.numValidMoves)
+end
+
 -- Returns true if the provided location is actually on the board
 function GameState:isOnBoard(location)
 	return location.x >= 1 and location.x <= NUM_BOARD_SPACES

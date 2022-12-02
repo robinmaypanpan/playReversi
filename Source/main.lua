@@ -129,7 +129,6 @@ function runGame()
 	gameController = GameController(board, whiteDisplay, blackDisplay)
 	
 	local loadedData = playdate.datastore.read()
-	loadedData = nil
 	if (loadedData) then
 		-- Load state from disk		
 		gameController.whitePlayer = getPlayer(loadedData.whitePlayer, gameController, WHITE)

@@ -20,7 +20,7 @@ function Player:takeTurn()
 	if (self:isReady()) then
 		self:chooseMove()
 	else
-		playdate.timer.performAfterDelay(200, function()
+		self.turnTimer = playdate.timer.performAfterDelay(200, function()
 			self:takeTurn()
 		end)
 	end
@@ -34,6 +34,10 @@ end
 
 -- Called when this player no longer should exist
 function Player:shutDown()
+	if (self.turnTimer) then
+		self.turnTimer:remove()
+		self.turnTimer = nil
+	end
 end
 
 -- Returns true if the player is ready to make a move

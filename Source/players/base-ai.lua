@@ -26,17 +26,19 @@ function BaseAi:chooseMove()
 		
 	local function onComplete(chosenMove)
 		self.thinking = false
-		playdate.timer.performAfterDelay(500, function() 
+		
+		self.activeAiTimer = playdate.timer.performAfterDelay(500, function() 
 			gameController:moveCursorTo(chosenMove) 
-			playdate.timer.performAfterDelay(200, function()
+			self.activeAiTimer = playdate.timer.performAfterDelay(200, function()
+				self.activeAiTimer = nil
 				gameController:makeMove(chosenMove)
 			end)
 		end)
 	end
 	
-	playdate.timer.performAfterDelay(10, function()		
+	self.activeAiTimer =playdate.timer.performAfterDelay(10, function()		
 		local chosenMove = self:thinkAboutMove()
-		playdate.timer.performAfterDelay(10, function()
+		self.activeAiTimer =playdate.timer.performAfterDelay(10, function()
 			onComplete(chosenMove)
 		end)
 	end)
@@ -46,4 +48,12 @@ end
 function BaseAi:thinkAboutMove()	
 	-- Should never be called in the base
 	assert(false)
+end
+
+function BaseAi:shutDown()
+	BaseAi.super.shutDown(self)
+	if (self.activeAiTimer) then
+		self.activeAiTimer:remove()
+		self.activeAiTimer = nil
+	end
 end

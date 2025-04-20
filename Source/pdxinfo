@@ -1,7 +1,7 @@
 name=FlipFlop
-author=Robin Mayorga
-description=Reversi game with AI
+author=Robin Genetti
+description=Reversi game with AI opponent
 bundleID=com.robinmaypanpan.reversi
-version=1.0
-buildNumber=20
+version=1.1
+buildNumber=22
 imagePath=SystemAssets
